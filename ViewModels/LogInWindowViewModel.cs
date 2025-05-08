@@ -241,7 +241,24 @@ namespace EBISX_POS.ViewModels
                 {
                     ErrorMessage = result.name;
                     OnPropertyChanged(nameof(HasError));
-                    IsLoading = false;
+                    IsLoading = false; 
+                    
+                    var alertBox = MessageBoxManager.GetMessageBoxStandard(
+                        new MessageBoxStandardParams
+                        {
+                            ContentHeader = "Login Error",
+                            ContentMessage = result.email,
+                            ButtonDefinitions = ButtonEnum.Ok,
+                            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                            CanResize = false,
+                            SizeToContent = SizeToContent.WidthAndHeight,
+                            Width = 400,
+                            ShowInCenter = true,
+                            SystemDecorations = SystemDecorations.None,
+                            Icon = Icon.Error,
+                        });
+
+                    await alertBox.ShowAsPopupAsync(owner);
                     return;
                 }
 

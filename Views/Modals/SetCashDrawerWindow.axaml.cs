@@ -47,10 +47,10 @@ namespace EBISX_POS.Views
             _autoCloseTimer.Tick += AutoCloseTimer_Tick;
 
 
-            if (_cashDrawer != "Cash-In" && _cashDrawer != "Cash-Out")
-            {
+            //if (_cashDrawer != "Cash-In" && _cashDrawer != "Cash-Out")
+            //{
                 _autoCloseTimer.Start();
-            }
+            //}
 
             CashInDrawer.AddHandler(TextInputEvent, OnUserActivity, RoutingStrategies.Tunnel);
             ManagerEmail.AddHandler(TextInputEvent, OnUserActivity, RoutingStrategies.Tunnel);
@@ -143,8 +143,8 @@ namespace EBISX_POS.Views
                 return;
             }
 
-            // Default: Cash-In / Cash-Out / Withdraw
-            if (!decimal.TryParse(input, out var amount) || amount < 1000)
+            // Default: Cash-In / Cash-Out
+            if (!decimal.TryParse(input, out var amount) || amount < 1000m && _cashDrawer != "Withdraw")
             {
                 await MessageBoxManager
                     .GetMessageBoxStandard("Invalid Input", "Please enter a valid amount.", ButtonEnum.Ok)
