@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using Avalonia.Threading;
 using System;
 using Microsoft.AspNetCore.Http.HttpResults;
+using MsBox.Avalonia.Dto;
 
 namespace EBISX_POS.Views
 {
@@ -176,7 +177,13 @@ namespace EBISX_POS.Views
             if (!success)
             {
                 await MessageBoxManager
-                    .GetMessageBoxStandard("Error", msg, ButtonEnum.Ok)
+                    .GetMessageBoxStandard(new MessageBoxStandardParams
+                    {
+                        ContentHeader = "Operation Failed",
+                        ContentMessage = msg,
+                        ButtonDefinitions = ButtonEnum.Ok,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner
+                    })
                     .ShowAsPopupAsync(this);
 
                 StartButton.IsEnabled = true;
@@ -184,6 +191,18 @@ namespace EBISX_POS.Views
                 Close();
                 return;
             }
+
+            await MessageBoxManager
+                .GetMessageBoxStandard(new MessageBoxStandardParams
+                {
+                    ContentHeader = "Success",
+                    ContentMessage = _cashDrawer == "Cash-In"
+                                            ? $"₱{amount:N2} has been added to the drawer."
+                                            : $"₱{amount:N2} has been removed from the drawer.",
+                    ButtonDefinitions = ButtonEnum.Ok,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner
+                })
+                .ShowAsPopupAsync(this);
 
             Close();
         }
