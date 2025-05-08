@@ -144,7 +144,7 @@ namespace EBISX_POS.Views
             }
 
             // Default: Cash-In / Cash-Out
-            if (!decimal.TryParse(input, out var amount) || amount < 1000m && _cashDrawer != "Withdraw")
+            if (!decimal.TryParse(input, out var amount) || (_cashDrawer != "Withdraw" && amount < 1000m))
             {
                 await MessageBoxManager
                     .GetMessageBoxStandard("Invalid Input", "Please enter a valid amount.", ButtonEnum.Ok)
