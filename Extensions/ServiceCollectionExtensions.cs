@@ -99,6 +99,7 @@ namespace EBISX_POS.API.Extensions
             services.AddScoped<IEbisxAPI, EbisxAPIRepository>();
             services.AddScoped<IReport, ReportRepository>();
             services.AddScoped<IInvoiceNumberService, InvoiceNumberService>();
+            services.AddScoped<IData, DataRepository>();
 
             return services;
         }

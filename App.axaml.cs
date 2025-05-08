@@ -20,6 +20,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
+using EBISX_POS.ViewModels.Manager;
 
 namespace EBISX_POS
 {
@@ -92,16 +93,17 @@ namespace EBISX_POS
                 {
                     DisableAvaloniaDataAnnotationValidation();
 
-                    CashierState.OnCashierStateChanged += () =>
-                    {
-                        desktop.MainWindow = !string.IsNullOrEmpty(CashierState.CashierName)
-                            ? Services.GetRequiredService<MainWindow>()
-                            : Services.GetRequiredService<LogInWindow>();
-                    };
+                    //CashierState.OnCashierStateChanged += () =>
+                    //{
+                    //    desktop.MainWindow = !string.IsNullOrEmpty(CashierState.CashierName)
+                    //        ? Services.GetRequiredService<MainWindow>()
+                    //        : Services.GetRequiredService<LogInWindow>();
+                    //};
 
-                    desktop.MainWindow = !string.IsNullOrEmpty(CashierState.CashierName)
-                        ? Services.GetRequiredService<MainWindow>()
-                        : Services.GetRequiredService<LogInWindow>();
+                    //desktop.MainWindow = !string.IsNullOrEmpty(CashierState.CashierName)
+                    //    ? Services.GetRequiredService<MainWindow>()
+                    //    : Services.GetRequiredService<LogInWindow>();
+                    desktop.MainWindow = Services.GetRequiredService<AppUsersWindow>();
                 }
             }
             catch (Exception ex)
@@ -183,6 +185,7 @@ namespace EBISX_POS
             services.AddTransient<OrderSummaryViewModel>();
             services.AddTransient<SubItemWindowViewModel>();
             services.AddTransient<TenderOrderViewModel>();
+            services.AddTransient<AppUsersViewModel>();
 
             // Register Views
             services.AddTransient<LogInWindow>();
@@ -192,6 +195,7 @@ namespace EBISX_POS
             services.AddTransient<ManagerWindow>();
             services.AddTransient<TenderOrderWindow>();
             services.AddTransient<SalesHistoryWindow>();
+            services.AddTransient<AppUsersWindow>();
 
             return services.BuildServiceProvider();
         }

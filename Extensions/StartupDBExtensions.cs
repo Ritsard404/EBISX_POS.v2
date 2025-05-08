@@ -68,8 +68,25 @@ namespace EBISX_POS.API.Extensions
                         };
 
                         await dataContext.PosTerminalInfo.AddAsync(terminal);
-                        await dataContext.SaveChangesAsync();
                     }
+
+                    if (!await dataContext.SaleType.AnyAsync())
+                    {
+
+                        var saleTypes = new SaleType[]
+                        {
+                            new SaleType { Name = "GCASH", Account = "A/R - GCASH", Type = "CHARGE" },
+                            new SaleType { Name = "PAYMAYA", Account = "A/R - PAYMAYA", Type = "CHARGE" },
+                            new SaleType { Name = "FOOD PANDA", Account = "A/R - FOOD PANDA", Type = "CHARGE" },
+                            new SaleType { Name = "GRAB", Account = "A/R - FOOD PANDA", Type = "CHARGE" },
+                            new SaleType { Name = "GIFT CHEQUE", Account = "A/R - PRODUCT GC", Type = "CHARGE" },
+                            new SaleType { Name = "DEBIT", Account = "A/R - DEBIT", Type = "CHARGE" },
+                            new SaleType { Name = "CREDIT", Account = "A/R - CREDIT", Type = "CHARGE" },
+                        };
+
+                        await dataContext.SaleType.AddRangeAsync(saleTypes);
+                    }
+                    await dataContext.SaveChangesAsync();
                 }
                 catch (Exception ex)
                 {
