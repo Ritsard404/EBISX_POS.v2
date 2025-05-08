@@ -31,8 +31,8 @@ namespace EBISX_POS.Views
 
         private async void AddOrderButton_Click(object? sender, RoutedEventArgs e)
         {
-            Close();
             await OrderState.FinalizeCurrentOrder(isSolo: false, this);
+            Close();
         }
     }
 }

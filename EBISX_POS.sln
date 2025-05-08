@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35728.132
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBISX_POS", "EBISX_POS.csproj", "{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBISX_POS.API", "..\EBISX_POS_API\EBISX_POS.API.csproj", "{91D5A14D-59F3-4B49-A926-7A7E4C3D8D13}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBISX_POS.API", "..\EBISX_POS_API.v2\EBISX_POS.API.csproj", "{4AC02136-6BA0-42AC-A4B0-54C0F03AC89A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{91D5A14D-59F3-4B49-A926-7A7E4C3D8D13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{91D5A14D-59F3-4B49-A926-7A7E4C3D8D13}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{91D5A14D-59F3-4B49-A926-7A7E4C3D8D13}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{91D5A14D-59F3-4B49-A926-7A7E4C3D8D13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AC02136-6BA0-42AC-A4B0-54C0F03AC89A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AC02136-6BA0-42AC-A4B0-54C0F03AC89A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AC02136-6BA0-42AC-A4B0-54C0F03AC89A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AC02136-6BA0-42AC-A4B0-54C0F03AC89A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

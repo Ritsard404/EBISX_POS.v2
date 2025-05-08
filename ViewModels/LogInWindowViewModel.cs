@@ -27,8 +27,16 @@ namespace EBISX_POS.ViewModels
         [ObservableProperty]
         private bool isLoading;
 
-        [ObservableProperty]
-        private string errorMessage;
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set
+            {
+                SetProperty(ref _errorMessage, value);
+                OnPropertyChanged(nameof(HasError));
+            }
+        }
 
         [ObservableProperty]
         private CashierDTO? selectedCashier;
@@ -228,10 +236,12 @@ namespace EBISX_POS.ViewModels
                 };
 
                 var result = await _authService.LogInAsync(logInDTO);
-                if (!result.sucess)
+                Debug.WriteLine($"{result.success} {result.isManager} {result.name} {result.email} ");
+                if (!result.success)
                 {
                     ErrorMessage = result.name;
                     OnPropertyChanged(nameof(HasError));
+                    IsLoading = false;
                     return;
                 }
 

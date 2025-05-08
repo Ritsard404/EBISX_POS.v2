@@ -75,11 +75,14 @@ namespace EBISX_POS.Services
             public string CashierName { get; set; } = string.Empty;
         }
 
-        public async Task<(bool sucess, bool isManager, string email, string name)> LogInAsync(LogInDTO logInDTO)
+        public async Task<(bool success, bool isManager, string email, string name)> LogInAsync(LogInDTO logInDTO)
         {
             try
             {
                 var logIn = await _auth.LogIn(logInDTO);
+                if(!logIn.success)
+                    return (false, false, "Invalid credentials. Please try again.", "");
+
                 return (logIn.success, logIn.isManager, logIn.email, logIn.name);  // Fixed order
 
                 if (string.IsNullOrEmpty(_apiSettings?.LocalAPI?.AuthEndpoint))
