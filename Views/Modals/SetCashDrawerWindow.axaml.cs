@@ -42,15 +42,15 @@ namespace EBISX_POS.Views
             // Close the dialog automatically after 5 seconds if no action is taken
             _autoCloseTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(5)
+                Interval = TimeSpan.FromSeconds(20)
             };
             _autoCloseTimer.Tick += AutoCloseTimer_Tick;
 
 
-            //if (_cashDrawer != "Cash-In" && _cashDrawer != "Cash-Out")
-            //{
+            if (_cashDrawer != "Cash-In" && _cashDrawer != "Cash-Out")
+            {
                 _autoCloseTimer.Start();
-            //}
+            }
 
             CashInDrawer.AddHandler(TextInputEvent, OnUserActivity, RoutingStrategies.Tunnel);
             ManagerEmail.AddHandler(TextInputEvent, OnUserActivity, RoutingStrategies.Tunnel);
