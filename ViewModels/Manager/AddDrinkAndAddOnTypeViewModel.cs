@@ -22,13 +22,30 @@ namespace EBISX_POS.ViewModels.Manager
         [ObservableProperty]
         private bool _isDrink;
 
+        public string DialogTitle => IsDrink ? "Add New Drink Type" : "Add New Add-On Type";
+        public string InputWatermark => IsDrink ? "Drink Type" : "Add-On Type";
+        public string InputText
+        {
+            get => IsDrink
+                ? DrinkTypeName
+                : AddOnTypeName;
+            set
+            {
+                if (IsDrink)
+                    DrinkTypeName = value;
+                else
+                    AddOnTypeName = value;
+            }
+        }
+
+
         [ObservableProperty]
         private string _drinkTypeName = string.Empty;
         [ObservableProperty]
         private string _addOnTypeName = string.Empty;
 
         [ObservableProperty]
-        private string? _errorMessage;
+        private bool _isLoading;
 
         public AddDrinkAndAddOnTypeViewModel(IMenu menuService, Window window, bool isDrink)
         {
@@ -40,98 +57,80 @@ namespace EBISX_POS.ViewModels.Manager
         [RelayCommand]
         private async Task AddMenuType()
         {
-            if (IsDrink)
-            {
-
-                if (string.IsNullOrWhiteSpace(DrinkTypeName))
-                {
-                    ShowError("All field are required");
-                    return;
-                }
-
-                var newDrinkType = new DrinkType
-                {
-                    DrinkTypeName = DrinkTypeName,
-                };
-
-                var (isSuccess, message, _) = await _menuService.AddDrinkType(newDrinkType, "EBISX@POS.com");
-
-                if (isSuccess)
-                {
-                    await ShowSuccess(message);
-                    _window.Close();
-                }
-                else
-                {
-                    ShowError(message);
-                }
-            }
-            else
-            {
-                if (string.IsNullOrWhiteSpace(AddOnTypeName))
-                {
-                    ShowError("All field are required");
-                    return;
-                }
-
-                var newAddOnType = new AddOnType
-                {
-                    AddOnTypeName = AddOnTypeName,
-                };
-
-                var (isSuccess, message, _) = await _menuService.AddAddOnType(newAddOnType, "EBISX@POS.com");
-
-                if (isSuccess)
-                {
-                    await ShowSuccess(message);
-                    _window.Close();
-                }
-                else
-                {
-                    ShowError(message);
-                }
-            }
-
+            if (IsLoading) return;
             try
             {
+                IsLoading = true;
+
+                if (IsDrink)
+                {
+                    if (string.IsNullOrWhiteSpace(DrinkTypeName))
+                    {
+                        await ShowMessage("Error", "All fields are required.", Icon.Error);
+                        return;
+                    }
+
+                    var (isSuccess, message, _) = await _menuService.AddDrinkType(
+                        new DrinkType { DrinkTypeName = DrinkTypeName },
+                        "EBISX@POS.com");
+
+                    await ShowMessage(isSuccess ? "Success" : "Error", message,
+                        isSuccess ? Icon.Success : Icon.Error);
+
+                    if (isSuccess)
+                        _window.Close();
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(AddOnTypeName))
+                    {
+                        await ShowMessage("Error", "All fields are required.", Icon.Error);
+                        return;
+                    }
+
+                    var (isSuccess, message, _) = await _menuService.AddAddOnType(
+                        new AddOnType { AddOnTypeName = AddOnTypeName },
+                        "EBISX@POS.com");
+
+                    await ShowMessage(isSuccess ? "Success" : "Error", message,
+                        isSuccess ? Icon.Success : Icon.Error);
+
+                    if (isSuccess)
+                        _window.Close();
+                }
             }
             catch (Exception ex)
             {
-                ShowError(ex.Message);
-                Debug.WriteLine($"❌ AddUser exception: {ex}");
+                DebugWrite(ex);
+                await ShowMessage("Error", ex.Message, Icon.Error);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
+        private void DebugWrite(Exception ex)
+        {
+#if DEBUG
+            Console.WriteLine($"❌ AddMenuType exception: {ex}");
+#endif
+        }
+
         [RelayCommand]
-        private void Cancel()
-        {
-            _window.Close();
-        }
+        private void Cancel() => _window.Close();
 
-        private async void ShowError(string message)
-        {
-            var msgBox = MessageBoxManager
-                .GetMessageBoxStandard(new MessageBoxStandardParams
-                {
-                    ButtonDefinitions = ButtonEnum.Ok,
-                    ContentTitle = "Error",
-                    ContentMessage = message,
-                    Icon = Icon.Error
-                });
 
-            await msgBox.ShowAsPopupAsync(_window);
-        }
-
-        private async Task ShowSuccess(string message)
+        private async Task ShowMessage(string title, string message, Icon icon)
         {
-            var successBox = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+            var msgBox = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
             {
                 ButtonDefinitions = ButtonEnum.Ok,
-                ContentTitle = "Success",
+                ContentTitle = title,
                 ContentMessage = message,
-                Icon = Icon.Success
+                Icon = icon
             });
-            await successBox.ShowAsPopupAsync(_window);
+            await msgBox.ShowAsPopupAsync(_window);
         }
     }
-} 
+}
