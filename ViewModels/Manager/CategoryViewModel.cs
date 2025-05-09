@@ -3,6 +3,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EBISX_POS.API.Models;
 using EBISX_POS.API.Services.Interfaces;
+using MsBox.Avalonia.Dto;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -68,8 +71,11 @@ namespace EBISX_POS.ViewModels.Manager
                 if (isSuccess)
                 {
                     await LoadCategories();
+                    await ShowSuccess(message);
                     return;
                 }
+                ShowError(message);
+                return;
             }
             catch (Exception ex)
             {
@@ -105,8 +111,11 @@ namespace EBISX_POS.ViewModels.Manager
                 if (isSuccess)
                 {
                     await LoadCategories();
+                    await ShowSuccess(message);
                     return;
                 }
+                ShowError(message);
+                return;
             }
             catch (Exception ex)
             {
@@ -126,6 +135,32 @@ namespace EBISX_POS.ViewModels.Manager
             {
                 SaveCategoryChanges(value);
             }
+        }
+
+        private async void ShowError(string message)
+        {
+            var msgBox = MessageBoxManager
+                .GetMessageBoxStandard(new MessageBoxStandardParams
+                {
+                    ButtonDefinitions = ButtonEnum.Ok,
+                    ContentTitle = "Error",
+                    ContentMessage = message,
+                    Icon = Icon.Error
+                });
+
+            await msgBox.ShowAsPopupAsync(_window);
+        }
+
+        private async Task ShowSuccess(string message)
+        {
+            var successBox = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+            {
+                ButtonDefinitions = ButtonEnum.Ok,
+                ContentTitle = "Success",
+                ContentMessage = message,
+                Icon = Icon.Success
+            });
+            await successBox.ShowAsPopupAsync(_window);
         }
     }
 }

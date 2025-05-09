@@ -52,7 +52,7 @@ namespace EBISX_POS.ViewModels.Manager
                 
                 if (isSuccess)
                 {
-                    ShowSuccess(message);
+                    await ShowSuccess(message);
                     _window.Close();
                 }
                 else
@@ -87,7 +87,7 @@ namespace EBISX_POS.ViewModels.Manager
             await msgBox.ShowAsPopupAsync(_window);
         }
 
-        private async void ShowSuccess(string message)
+        private async Task ShowSuccess(string message)
         {
             var successBox = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
             {
