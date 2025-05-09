@@ -8,6 +8,11 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Avalonia.Controls;
+using Avalonia.Threading;
+using System.Linq;
+using MsBox.Avalonia.Dto;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
 
 namespace EBISX_POS.ViewModels.Manager
 {
@@ -25,138 +30,110 @@ namespace EBISX_POS.ViewModels.Manager
         [ObservableProperty]
         private bool _isLoading;
 
-        [ObservableProperty]
-        private string? _errorMessage;
-
         public List<string> Roles { get; } = new() { "Manager", "Cashier" };
-
-        public List<StatusOption> StatusOptions { get; } = new()
-        {
-            new StatusOption { Display = "Active", Value = true },
-            new StatusOption { Display = "Inactive", Value = false }
-        };
+        public List<string> StatusOptions { get; } = new() { "Active", "InActive" };
 
         public AppUsersViewModel(IData dataService, Window window)
         {
-            Debug.WriteLine("→ AppUsersViewModel constructor started");
-            _dataService = dataService;
-            _window = window;
-            
-            // Initialize with empty collection
-            Users = new ObservableCollection<User>();
-            
-            // Load users after initialization
-            Task.Run(async () => 
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
+            _window = window ?? throw new ArgumentNullException(nameof(window));
+
+            InitializeAsync();
+        }
+
+        private async void InitializeAsync()
+        {
+            try
             {
-                await Task.Delay(100); // Small delay to ensure UI is ready
                 await LoadUsersCommand.ExecuteAsync(null);
-            });
-            
-            Debug.WriteLine("→ AppUsersViewModel constructor finished");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error initializing AppUsersViewModel: {ex}");
+            }
         }
 
         [RelayCommand]
         private async Task LoadUsers()
         {
-            Debug.WriteLine("→ LoadUsers started");
-            if (_dataService == null)
-            {
-                Debug.WriteLine("‼️ LoadUsers: _dataService is null");
-                return;
-            }
-
             try
             {
-                IsLoading = true;
-                ErrorMessage = null;
-                Debug.WriteLine("… calling GetUsers()");
+                //await Dispatcher.UIThread.InvokeAsync(() =>
+                //{
+                //    IsLoading = true;
+                //    ErrorMessage = null;
+                //});
+
                 var users = await _dataService.GetUsers();
+
+                //await Dispatcher.UIThread.InvokeAsync(() =>
+                //{
                 Users = new ObservableCollection<User>(users);
-                Debug.WriteLine($"✅ Loaded {users.Count} users.");
+                //});
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to load users: {ex.Message}";
-                Debug.WriteLine($"❌ LoadUsers exception: {ex}");
+                Debug.WriteLine($"Error loading users: {ex}");
             }
             finally
             {
-                IsLoading = false;
-                Debug.WriteLine("→ LoadUsers finished");
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    IsLoading = false;
+                });
             }
         }
 
         [RelayCommand]
         private async Task SaveUserChanges(User user)
         {
-            Debug.WriteLine($"→ SaveUserChanges started for {user.UserEmail}");
-            if (user == null)
-            {
-                Debug.WriteLine("‼️ SaveUserChanges: user is null");
-                return;
-            }
-            if (_dataService == null)
-            {
-                Debug.WriteLine("‼️ SaveUserChanges: _dataService is null");
-                return;
-            }
+            if (user == null) return;
 
             try
             {
-                IsLoading = true;
-                ErrorMessage = null;
-                Debug.WriteLine($"… calling UpdateUser for {user.UserEmail}");
                 var (isSuccess, message) = await _dataService.UpdateUser(user, "user@example.com");
-                Debug.WriteLine($"… UpdateUser returned success={isSuccess}, message='{message}'");
 
-                if (!isSuccess)
+                if (isSuccess)
                 {
-                    ErrorMessage = message;
-                    Debug.WriteLine($"❌ SaveUserChanges error: {message}");
-                }
-                else
-                {
-                    Debug.WriteLine("✅ SaveUserChanges succeeded, reloading users");
                     await LoadUsersCommand.ExecuteAsync(null);
+                    return;
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to save changes: {ex.Message}";
-                Debug.WriteLine($"❌ SaveUserChanges exception: {ex}");
-            }
-            finally
-            {
-                IsLoading = false;
-                Debug.WriteLine("→ SaveUserChanges finished");
+                Debug.WriteLine($"Error saving user changes: {ex}");
             }
         }
 
         [RelayCommand]
         private async Task AddUser()
         {
-            var addUserWindow = new AddUserWindow
+            try
             {
-                DataContext = new AddUserViewModel(_dataService, _window)
-            };
+                var addUserWindow = new AddUserWindow();
+                addUserWindow.DataContext = new AddUserViewModel(_dataService, addUserWindow);
 
-            await addUserWindow.ShowDialog(_window);
-            await LoadUsersCommand.ExecuteAsync(null);
+                await addUserWindow.ShowDialog(_window);
+                await LoadUsersCommand.ExecuteAsync(null);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error opening add user window: {ex}");
+            }
+        }
+
+        [RelayCommand]
+        private async Task CloseWindow()
+        {
+            _window.Close();
         }
 
         partial void OnSelectedUserChanged(User? value)
         {
-            Debug.WriteLine($"→ OnSelectedUserChanged fired: {(value?.UserEmail ?? "null")}");
             if (value != null)
             {
                 SaveUserChangesCommand.Execute(value);
             }
         }
-    }
-
-    public class StatusOption
-    {
-        public string Display { get; set; } = string.Empty;
-        public bool Value { get; set; }
     }
 }

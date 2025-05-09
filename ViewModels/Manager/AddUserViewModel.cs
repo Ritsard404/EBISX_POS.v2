@@ -56,7 +56,6 @@ namespace EBISX_POS.ViewModels.Manager
                     UserFName = FirstName,
                     UserLName = LastName,
                     UserRole = Role,
-                    IsActive = true
                 };
 
                 var (isSuccess, message, _) = await _dataService.AddUser(newUser, "user@example.com");

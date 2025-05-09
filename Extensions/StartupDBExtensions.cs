@@ -51,6 +51,20 @@ namespace EBISX_POS.API.Extensions
                     await InitializeAvaloniaDatabaseAsync(journalContext, "Journal");
 
                     // Check if we need to seed initial data
+
+                    if (!await dataContext.User.AnyAsync())
+                    {
+                        var users = new User
+                        {
+                            UserEmail = "EBISX@POS.com",
+                            UserFName = "Ebisx",
+                            UserLName = "Pos",
+                            UserRole = "Manager"
+                        };
+
+                        await dataContext.User.AddAsync(users);
+                    }
+
                     if (!await dataContext.PosTerminalInfo.AnyAsync())
                     {
                         var terminal = new PosTerminalInfo
@@ -105,7 +119,7 @@ namespace EBISX_POS.API.Extensions
                 services,
                 services.GetRequiredService<IConfiguration>()
             );
-            
+
             await initializer.InitializeAsync();
         }
     }

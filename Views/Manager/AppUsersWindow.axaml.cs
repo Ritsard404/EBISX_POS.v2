@@ -7,6 +7,8 @@ namespace EBISX_POS;
 
 public partial class AppUsersWindow : Window
 {
+    private AppUsersViewModel ViewModel => (AppUsersViewModel)DataContext!;
+
     public AppUsersWindow()
     {
         InitializeComponent();
@@ -16,5 +18,19 @@ public partial class AppUsersWindow : Window
         
         // Create and set the ViewModel
         DataContext = new AppUsersViewModel(dataService, this);
+    }
+    private void OnStatusComboLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (sender is ComboBox combo)
+        {
+            combo.ItemsSource = ViewModel.StatusOptions;
+        }
+    }
+    private void OnRoleComboLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (sender is ComboBox combo)
+        {
+            combo.ItemsSource = ViewModel.Roles;
+        }
     }
 }
