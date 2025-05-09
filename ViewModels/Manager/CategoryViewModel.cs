@@ -71,7 +71,7 @@ namespace EBISX_POS.ViewModels.Manager
                 if (isSuccess)
                 {
                     await LoadCategories();
-                    await ShowSuccess(message);
+                    //await ShowSuccess(message);
                     return;
                 }
                 ShowError(message);
