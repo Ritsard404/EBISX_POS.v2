@@ -63,7 +63,7 @@ namespace EBISX_POS.ViewModels.Manager
 
             try
             {
-                var (isSuccess, message) = await _menuService.UpdateCategory(category, "user@example.com");
+                var (isSuccess, message) = await _menuService.UpdateCategory(category, "EBISX@POS.com");
 
                 if (isSuccess)
                 {
@@ -100,7 +100,7 @@ namespace EBISX_POS.ViewModels.Manager
 
             try
             {
-                var (isSuccess, message) = await _menuService.DeleteCategory(SelectedCategory.Id, "user@example.com");
+                var (isSuccess, message) = await _menuService.DeleteCategory(SelectedCategory.Id, "EBISX@POS.com");
 
                 if (isSuccess)
                 {

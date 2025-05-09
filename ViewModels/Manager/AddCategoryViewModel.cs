@@ -48,7 +48,7 @@ namespace EBISX_POS.ViewModels.Manager
                     CtgryName = CategoryName,
                 };
 
-                var (isSuccess, message, _) = await _menuService.AddCategory(newCategory, "user@example.com");
+                var (isSuccess, message, _) = await _menuService.AddCategory(newCategory, "EBISX@POS.com");
                 
                 if (isSuccess)
                 {
