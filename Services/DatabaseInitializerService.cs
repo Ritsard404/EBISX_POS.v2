@@ -191,6 +191,36 @@ namespace EBISX_POS.Services
                     };
 
                     await _dataContext.PosTerminalInfo.AddAsync(terminal, cts.Token);
+
+                    if (!await _dataContext.User.AnyAsync())
+                    {
+                        var users = new User
+                        {
+                            UserEmail = "EBISX@POS.com",
+                            UserFName = "Ebisx",
+                            UserLName = "Pos",
+                            UserRole = "Manager"
+                        };
+
+                        await _dataContext.User.AddAsync(users, cts.Token);
+                    }
+
+                    if (!await _dataContext.SaleType.AnyAsync())
+                    {
+
+                        var saleTypes = new SaleType[]
+                        {
+                            new SaleType { Name = "GCASH", Account = "A/R - GCASH", Type = "CHARGE" },
+                            new SaleType { Name = "PAYMAYA", Account = "A/R - PAYMAYA", Type = "CHARGE" },
+                            new SaleType { Name = "FOOD PANDA", Account = "A/R - FOOD PANDA", Type = "CHARGE" },
+                            new SaleType { Name = "GRAB", Account = "A/R - FOOD PANDA", Type = "CHARGE" },
+                            new SaleType { Name = "GIFT CHEQUE", Account = "A/R - PRODUCT GC", Type = "CHARGE" },
+                            new SaleType { Name = "DEBIT", Account = "A/R - DEBIT", Type = "CHARGE" },
+                            new SaleType { Name = "CREDIT", Account = "A/R - CREDIT", Type = "CHARGE" },
+                        };
+
+                        await _dataContext.SaleType.AddRangeAsync(saleTypes, cts.Token);
+                    }
                     await _dataContext.SaveChangesAsync(cts.Token);
                     Debug.WriteLine("Initial POS terminal data seeded successfully.");
                 }

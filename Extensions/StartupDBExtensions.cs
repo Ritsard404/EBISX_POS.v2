@@ -52,19 +52,6 @@ namespace EBISX_POS.API.Extensions
 
                     // Check if we need to seed initial data
 
-                    if (!await dataContext.User.AnyAsync())
-                    {
-                        var users = new User
-                        {
-                            UserEmail = "EBISX@POS.com",
-                            UserFName = "Ebisx",
-                            UserLName = "Pos",
-                            UserRole = "Manager"
-                        };
-
-                        await dataContext.User.AddAsync(users);
-                    }
-
                     if (!await dataContext.PosTerminalInfo.AnyAsync())
                     {
                         var terminal = new PosTerminalInfo
@@ -82,6 +69,19 @@ namespace EBISX_POS.API.Extensions
                         };
 
                         await dataContext.PosTerminalInfo.AddAsync(terminal);
+                    }
+
+                    if (!await dataContext.User.AnyAsync())
+                    {
+                        var users = new User
+                        {
+                            UserEmail = "EBISX@POS.com",
+                            UserFName = "Ebisx",
+                            UserLName = "Pos",
+                            UserRole = "Manager"
+                        };
+
+                        await dataContext.User.AddAsync(users);
                     }
 
                     if (!await dataContext.SaleType.AnyAsync())

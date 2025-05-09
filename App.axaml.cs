@@ -103,7 +103,7 @@ namespace EBISX_POS
                     //desktop.MainWindow = !string.IsNullOrEmpty(CashierState.CashierName)
                     //    ? Services.GetRequiredService<MainWindow>()
                     //    : Services.GetRequiredService<LogInWindow>();
-                    desktop.MainWindow = Services.GetRequiredService<AppUsersWindow>();
+                    desktop.MainWindow = Services.GetRequiredService<CategoryWindow>();
                 }
             }
             catch (Exception ex)
@@ -196,6 +196,7 @@ namespace EBISX_POS
             services.AddTransient<TenderOrderWindow>();
             services.AddTransient<SalesHistoryWindow>();
             services.AddTransient<AppUsersWindow>();
+            services.AddTransient<CategoryWindow>();
 
             return services.BuildServiceProvider();
         }
