@@ -228,16 +228,84 @@
 			<Grid Grid.Column="2" Width="380" RowDefinitions="*, Auto">
 				<!-- Content Area Inside Menu -->
 				<Border Grid.Row="0" BorderBrush="Orange" BorderThickness="0,0,0,3">
-					<!-- Receipt content here -->
-					<StackPanel Margin="10" x:Name="DataLayout">
-						<TextBlock FontSize="30" Text="Data" HorizontalAlignment="Center"/>
-						<Button Classes="myButton"
-								Click="LoadData_Click">
-							<StackPanel VerticalAlignment="Center" Orientation="Vertical">
-								<TextBlock FontSize="30" Text="Load Data"/>
-							</StackPanel>
-						</Button>
-					</StackPanel>
+					<ScrollViewer VerticalScrollBarVisibility="Auto">
+						<StackPanel Margin="10" x:Name="DataLayout" Spacing="10">
+							<TextBlock FontSize="30" 
+									 Text="Data Management" 
+									 HorizontalAlignment="Center"
+									 Margin="0,0,0,10"
+									 FontWeight="Bold"/>
+							
+							<!-- First Pair -->
+							<Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
+								<Button Classes="myButton"
+										Click="LoadData_Click"
+										Grid.Column="0">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="Load Data"/>
+									</StackPanel>
+								</Button>
+
+								<Button Classes="myButton"
+										Grid.Column="1">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="User"/>
+										<TextBlock FontSize="20" Text="Management"/>
+									</StackPanel>
+								</Button>
+							</Grid>
+
+							<!-- Second Pair -->
+							<Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
+								<Button Classes="myButton"
+										Grid.Column="0">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="Menu Types"/>
+										<TextBlock FontSize="20" Text="Management"/>
+									</StackPanel>
+								</Button>
+
+								<Button Classes="myButton"
+										Grid.Column="1">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="Menu"/>
+										<TextBlock FontSize="30" Text="Category"/>
+									</StackPanel>
+								</Button>
+							</Grid>
+
+							<!-- Third Pair -->
+							<Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
+								<Button Classes="myButton"
+										Grid.Column="0">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="Menu"/>
+										<TextBlock FontSize="20" Text="Management"/>
+									</StackPanel>
+								</Button>
+
+								<Button Classes="myButton"
+										Grid.Column="1">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="Coupon"/>
+										<TextBlock FontSize="30" Text="And Promo"/>
+									</StackPanel>
+								</Button>
+							</Grid>
+						</StackPanel>
+					</ScrollViewer>
 				</Border>
 
 				<!-- Bottom Keyboard -->

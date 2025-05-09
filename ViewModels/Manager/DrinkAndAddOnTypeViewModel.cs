@@ -13,10 +13,14 @@ using System.Threading.Tasks;
 
 namespace EBISX_POS.ViewModels.Manager
 {
+    /// <summary>
+    /// ViewModel for managing drink and add-on types
+    /// </summary>
     public partial class DrinkAndAddOnTypeViewModel : ObservableObject
     {
         private readonly IMenu _menuService;
         private readonly Window _window;
+        private const string DEFAULT_USER = "EBISX@POS.com";
 
         [ObservableProperty]
         private ObservableCollection<AddOnType> _addOnTypes = new();
@@ -41,32 +45,22 @@ namespace EBISX_POS.ViewModels.Manager
             _ = LoadAddOnsAndDrinks();
         }
 
+        /// <summary>
+        /// Loads both add-on types and drink types from the service
+        /// </summary>
         private async Task LoadAddOnsAndDrinks()
         {
             try
             {
                 IsLoading = true;
-                var addOnTypes = await _menuService.GetAddOnTypes();
-                var drinkTypes = await _menuService.GetDrinkTypes();
-                if (addOnTypes != null)
-                {
-                    AddOnTypes.Clear();
-                    foreach (var addOn in addOnTypes)
-                    {
-                        AddOnTypes.Add(addOn);
-                    }
-                }
-                if (drinkTypes != null)
-                {
-                    DrinkTypes.Clear();
-                    foreach (var drinkType in drinkTypes)
-                    {
-                        DrinkTypes.Add(drinkType);
-                    }
-                }
+                await Task.WhenAll(
+                    LoadAddOnTypes(),
+                    LoadDrinkTypes()
+                );
             }
             catch (Exception ex)
             {
+                await ShowError($"Error loading data: {ex.Message}");
                 Debug.WriteLine($"Error loading Add ons and DrinkTypes: {ex}");
             }
             finally
@@ -75,47 +69,91 @@ namespace EBISX_POS.ViewModels.Manager
             }
         }
 
-        private async void SaveAddOnTypeChanges(AddOnType addOnType)
+        private async Task LoadAddOnTypes()
         {
-            if (addOnType == null) return;
-
-            try
+            var addOnTypes = await _menuService.GetAddOnTypes();
+            if (addOnTypes != null)
             {
-                var (isSuccess, message) = await _menuService.UpdateAddOnType(addOnType, "EBISX@POS.com");
-
-                if (isSuccess)
+                AddOnTypes.Clear();
+                foreach (var addOn in addOnTypes)
                 {
-                    await LoadAddOnsAndDrinks();
-                    return;
+                    AddOnTypes.Add(addOn);
                 }
-                ShowError(message);
-                return;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error saving user changes: {ex}");
             }
         }
 
-        private async void SaveDrinkTypeChanges(DrinkType drinkType)
+        private async Task LoadDrinkTypes()
         {
-            if (drinkType == null) return;
+            var drinkTypes = await _menuService.GetDrinkTypes();
+            if (drinkTypes != null)
+            {
+                DrinkTypes.Clear();
+                foreach (var drinkType in drinkTypes)
+                {
+                    DrinkTypes.Add(drinkType);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generic method to handle type updates (both AddOn and Drink types)
+        /// </summary>
+        private async Task<bool> UpdateType<T>(T type, Func<T, string, Task<(bool, string)>> updateAction)
+        {
+            if (type == null) return false;
 
             try
             {
-                var (isSuccess, message) = await _menuService.UpdateDrinkType(drinkType, "EBISX@POS.com");
+                var (isSuccess, message) = await updateAction(type, DEFAULT_USER);
 
                 if (isSuccess)
                 {
                     await LoadAddOnsAndDrinks();
-                    return;
+                    return true;
                 }
-                ShowError(message);
-                return;
+                await ShowError(message);
+                return false;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error saving user changes: {ex}");
+                await ShowError($"Error updating type: {ex.Message}");
+                Debug.WriteLine($"Error saving changes: {ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Generic method to handle type deletion (both AddOn and Drink types)
+        /// </summary>
+        private async Task<bool> DeleteType<T>(T type, Func<int, string, Task<(bool, string)>> deleteAction)
+        {
+            if (type == null) return false;
+
+            try
+            {
+                var id = type switch
+                {
+                    AddOnType addOn => addOn.Id,
+                    DrinkType drink => drink.Id,
+                    _ => throw new ArgumentException("Unsupported type")
+                };
+
+                var (isSuccess, message) = await deleteAction(id, DEFAULT_USER);
+
+                if (isSuccess)
+                {
+                    await LoadAddOnsAndDrinks();
+                    await ShowSuccess(message);
+                    return true;
+                }
+                await ShowError(message);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                await ShowError($"Error deleting type: {ex.Message}");
+                Debug.WriteLine($"Error deleting type: {ex}");
+                return false;
             }
         }
 
@@ -124,15 +162,15 @@ namespace EBISX_POS.ViewModels.Manager
         {
             try
             {
-                var addDrinkAndAddOnTypeWindow = new AddDrinkAndAddOnTypeWindow();
-                addDrinkAndAddOnTypeWindow.DataContext = new AddDrinkAndAddOnTypeViewModel(_menuService, addDrinkAndAddOnTypeWindow, false);
-
-                await addDrinkAndAddOnTypeWindow.ShowDialog(_window);
+                var window = new AddDrinkAndAddOnTypeWindow();
+                window.DataContext = new AddDrinkAndAddOnTypeViewModel(_menuService, window, false);
+                await window.ShowDialog(_window);
                 await LoadAddOnsAndDrinks();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error opening add user window: {ex}");
+                await ShowError($"Error opening add-on type window: {ex.Message}");
+                Debug.WriteLine($"Error opening add-on type window: {ex}");
             }
         }
 
@@ -141,61 +179,30 @@ namespace EBISX_POS.ViewModels.Manager
         {
             try
             {
-                var addDrinkAndAddOnTypeWindow = new AddDrinkAndAddOnTypeWindow();
-                addDrinkAndAddOnTypeWindow.DataContext = new AddDrinkAndAddOnTypeViewModel(_menuService, addDrinkAndAddOnTypeWindow, true);
-
-                await addDrinkAndAddOnTypeWindow.ShowDialog(_window);
+                var window = new AddDrinkAndAddOnTypeWindow();
+                window.DataContext = new AddDrinkAndAddOnTypeViewModel(_menuService, window, true);
+                await window.ShowDialog(_window);
                 await LoadAddOnsAndDrinks();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error opening add user window: {ex}");
+                await ShowError($"Error opening drink type window: {ex.Message}");
+                Debug.WriteLine($"Error opening drink type window: {ex}");
             }
         }
-
         public async Task RemoveAddOnType()
         {
-            if (SelectedAddOnType == null) return;
-
-            try
+            if (SelectedAddOnType != null)
             {
-                var (isSuccess, message) = await _menuService.DeleteAddOnType(SelectedAddOnType.Id, "EBISX@POS.com");
-
-                if (isSuccess)
-                {
-                    await LoadAddOnsAndDrinks();
-                    await ShowSuccess(message);
-                    return;
-                }
-                ShowError(message);
-                return;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error saving user changes: {ex}");
+                await DeleteType(SelectedAddOnType, _menuService.DeleteAddOnType);
             }
         }
 
         public async Task RemoveDrinkType()
         {
-            if (SelectedDrinkType == null) return;
-
-            try
+            if (SelectedDrinkType != null)
             {
-                var (isSuccess, message) = await _menuService.DeleteDrinkType(SelectedDrinkType.Id, "EBISX@POS.com");
-
-                if (isSuccess)
-                {
-                    await LoadAddOnsAndDrinks();
-                    await ShowSuccess(message);
-                    return;
-                }
-                ShowError(message);
-                return;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error saving user changes: {ex}");
+                await DeleteType(SelectedDrinkType, _menuService.DeleteDrinkType);
             }
         }
 
@@ -209,27 +216,27 @@ namespace EBISX_POS.ViewModels.Manager
         {
             if (value != null)
             {
-                SaveDrinkTypeChanges(value);
+                _ = UpdateType(value, _menuService.UpdateDrinkType);
             }
         }
+
         partial void OnSelectedAddOnTypeChanged(AddOnType? value)
         {
             if (value != null)
             {
-                SaveAddOnTypeChanges(value);
+                _ = UpdateType(value, _menuService.UpdateAddOnType);
             }
         }
 
-        private async void ShowError(string message)
+        private async Task ShowError(string message)
         {
-            var msgBox = MessageBoxManager
-                .GetMessageBoxStandard(new MessageBoxStandardParams
-                {
-                    ButtonDefinitions = ButtonEnum.Ok,
-                    ContentTitle = "Error",
-                    ContentMessage = message,
-                    Icon = Icon.Error
-                });
+            var msgBox = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+            {
+                ButtonDefinitions = ButtonEnum.Ok,
+                ContentTitle = "Error",
+                ContentMessage = message,
+                Icon = Icon.Error
+            });
 
             await msgBox.ShowAsPopupAsync(_window);
         }
