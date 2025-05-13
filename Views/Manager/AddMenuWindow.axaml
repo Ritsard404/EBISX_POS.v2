@@ -1,0 +1,146 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="550"
+		Width="500" Height="550"
+        x:Class="EBISX_POS.AddMenuWindow"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:AddMenuViewModel"
+        Title="AddMenuWindow"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        CornerRadius="10">
+
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+
+		<Grid RowDefinitions="Auto,*,Auto" Margin="20">
+			<TextBlock Grid.Row="0"
+                      Text="Add New Menu"
+                      FontSize="20"
+                      FontWeight="Bold"
+                      Margin="0,0,0,20"/>
+
+			<StackPanel
+				Grid.Row="1"
+				Orientation="Vertical"
+				Spacing="15"
+				HorizontalAlignment="Center"
+				Margin="0,20">
+
+				<StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+					<Grid>
+						<Button
+						  Width="150"
+						  Height="150"
+						  Padding="0"
+						  BorderBrush="Gray"
+						  BorderThickness="1"
+						  Command="{Binding UploadImageCommand}">
+							<Grid>
+								<Image
+								  Source="{Binding SelectedImage}"
+								  Stretch="Uniform"
+								  Opacity="{Binding SelectedImage, Converter={StaticResource NullToOpacityConverter}}"/>
+								<TextBlock
+								  Text="📷"
+								  FontSize="24"
+								  HorizontalAlignment="Center"
+								  VerticalAlignment="Center"
+								  IsHitTestVisible="False"
+								  Opacity="{Binding SelectedImage, Converter={StaticResource NullToOpacityConverter}, ConverterParameter=Inverse}"/>
+							</Grid>
+						</Button>
+						<Button
+						  Width="24"
+						  Height="24"
+						  Padding="0"
+						  HorizontalAlignment="Right"
+						  VerticalAlignment="Top"
+						  Margin="0,-12,-12,0"
+						  Command="{Binding ClearImageCommand}"
+						  Opacity="{Binding SelectedImage, Converter={StaticResource NullToOpacityConverter}}">
+							<PathIcon Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+						</Button>
+					</Grid>
+				</StackPanel>
+				
+				<!-- Row 1: Name & Price -->
+				<StackPanel Orientation="Horizontal" Spacing="10">
+					<TextBox
+					  Width="200"
+					  Watermark="Name"
+					  Text="{Binding MenuDetails.MenuName, UpdateSourceTrigger=PropertyChanged}"/>
+					<TextBox
+					  Width="100"
+					  Watermark="Price"
+					  Text="{Binding MenuDetails.MenuPrice, UpdateSourceTrigger=PropertyChanged}"/>
+				</StackPanel>
+
+				<!-- Row 2: Category & Size -->
+				<StackPanel Orientation="Horizontal" Spacing="10">
+					<ComboBox
+					  Width="200"
+					  ItemsSource="{Binding Categories}"
+					  DisplayMemberBinding="{Binding CtgryName}"
+					  SelectedItem="{Binding MenuDetails.Category}"
+					  PlaceholderText="Select Category"
+					  MaxDropDownHeight="100"/>
+					<ComboBox
+					  Width="150"
+					  ItemsSource="{Binding DrinkSizes}"
+					  SelectedItem="{Binding MenuDetails.Size}"
+					  PlaceholderText="Select Size"
+					  MaxDropDownHeight="100"/>
+				</StackPanel>
+
+				<!-- Row 3: Add-On & Drink Type -->
+				<StackPanel Orientation="Horizontal" Spacing="10">
+					<ComboBox
+					  Width="200"
+					  ItemsSource="{Binding AddOns}"
+					  DisplayMemberBinding="{Binding AddOnTypeName}"
+					  SelectedItem="{Binding MenuDetails.AddOnType}"
+					  PlaceholderText="Select Add-On"
+					  MaxDropDownHeight="100"/>
+					<ComboBox
+					  Width="200"
+					  ItemsSource="{Binding Drinks}"
+					  DisplayMemberBinding="{Binding DrinkTypeName}"
+					  SelectedItem="{Binding MenuDetails.DrinkType}"
+					  PlaceholderText="Select Drink"
+					  MaxDropDownHeight="100"/>
+				</StackPanel>
+
+				<!-- Row 4: Flags -->
+				<StackPanel Orientation="Horizontal" Spacing="10">
+					<ToggleButton
+					  Width="100"
+					  Content="Has Add-On"
+					  IsChecked="{Binding MenuDetails.HasAddOn}"/>
+					<ToggleButton
+					  Width="100"
+					  Content="Has Drink"
+					  IsChecked="{Binding MenuDetails.HasDrink}"/>
+					<ToggleButton
+					  Width="100"
+					  Content="Is Add-On"
+					  IsChecked="{Binding MenuDetails.IsAddOn}"/>
+				</StackPanel>
+
+			</StackPanel>
+
+			<StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="10"
+                        Margin="0,20,0,0">
+				<Button Content="Cancel"
+                        Padding="20,5"
+						Command="{Binding CancelCommand}"/>
+				<Button Content="Add Category"
+                        Padding="20,5"/>
+			</StackPanel>
+		</Grid>
+	</Border>
+</Window>

@@ -69,6 +69,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Converter\" />
 		<Folder Include="Services\API\" />
 		<Folder Include="Services\API\" />
 	</ItemGroup>

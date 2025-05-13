@@ -31,5 +31,6 @@
 		<converters:BoolToOnlineOfflineTextConverter x:Key="BoolToOnlineOfflineText"/>
 		<converters:BoolToStatusConverter x:Key="BoolToStatusConverter"/>
 		<converters:StringToBoolConverter x:Key="StringToBoolConverter"/>
+		<converters:NullToOpacityConverter x:Key="NullToOpacityConverter"/>
 	</Application.Resources>
 </Application>

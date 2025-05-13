@@ -1,0 +1,72 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="EBISX_POS.MenuWindow"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:MenuViewModel"
+        Title="MenuWindow"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="BorderOnly"
+        CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+
+		<Grid RowDefinitions="Auto,*">
+			<!-- Top Bar with Add Button and X Button -->
+			<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="10,10,10,0">
+				<Button Content="X"
+						Grid.Row="0"
+						Padding="10,5"
+						CornerRadius="5"
+						HorizontalAlignment="Right"
+						Command="{Binding CloseWindowCommand}"/>
+				<Button Content="Add New Menu"
+						Grid.Row="0"
+						Padding="10,5"
+						CornerRadius="5"
+						HorizontalAlignment="Left"
+						Command="{Binding AddNewMenuCommand}"/>
+
+			</Grid>
+
+				<Grid Grid.Row="1">
+					<DataGrid Margin="20"
+							  CanUserReorderColumns="True"
+								  CanUserResizeColumns="True"
+								  CanUserSortColumns="True"
+								  GridLinesVisibility="All"
+								  HorizontalAlignment="Center"
+								  VerticalScrollBarVisibility="Auto"
+								  HorizontalScrollBarVisibility="Auto"
+								  BorderThickness="1" BorderBrush="Gray"
+								  CornerRadius="10"
+								  IsReadOnly="False">
+						<DataGrid.Columns>
+							<DataGridTextColumn
+								 Header="Image"/>
+							<DataGridTextColumn
+								 Header="Name"/>
+							<DataGridTextColumn
+								 Header="Price (₱)"/>
+							<DataGridTextColumn
+								 Header="Size"/>
+							<DataGridTextColumn
+								 Header="Category"/>
+							<DataGridTextColumn
+								 Header="Has Drink"/>
+							<DataGridTextColumn
+								 Header="Has Add-On"/>
+							<DataGridTextColumn
+								 Header="Is Add-On"/>
+							<DataGridTextColumn
+								 Header="Available"/>
+							<DataGridTextColumn
+								 Header="Action"/>
+						</DataGrid.Columns>
+					</DataGrid>
+
+			</Grid>
+		</Grid>
+	</Border>
+</Window>
