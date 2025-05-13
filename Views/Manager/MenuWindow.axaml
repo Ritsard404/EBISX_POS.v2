@@ -30,42 +30,81 @@
 
 			</Grid>
 
-				<Grid Grid.Row="1">
-					<DataGrid Margin="20"
-							  CanUserReorderColumns="True"
-								  CanUserResizeColumns="True"
-								  CanUserSortColumns="True"
-								  GridLinesVisibility="All"
-								  HorizontalAlignment="Center"
-								  VerticalScrollBarVisibility="Auto"
-								  HorizontalScrollBarVisibility="Auto"
-								  BorderThickness="1" BorderBrush="Gray"
-								  CornerRadius="10"
-								  IsReadOnly="False">
-						<DataGrid.Columns>
-							<DataGridTextColumn
-								 Header="Image"/>
-							<DataGridTextColumn
-								 Header="Name"/>
-							<DataGridTextColumn
-								 Header="Price (₱)"/>
-							<DataGridTextColumn
-								 Header="Size"/>
-							<DataGridTextColumn
-								 Header="Category"/>
-							<DataGridTextColumn
-								 Header="Has Drink"/>
-							<DataGridTextColumn
-								 Header="Has Add-On"/>
-							<DataGridTextColumn
-								 Header="Is Add-On"/>
-							<DataGridTextColumn
-								 Header="Available"/>
-							<DataGridTextColumn
-								 Header="Action"/>
-						</DataGrid.Columns>
-					</DataGrid>
+			<Grid Grid.Row="1">
+				<DataGrid Margin="20"
+          ItemsSource="{Binding Menus}"
+			SelectedItem="{Binding SelectedMenu}"
+          AutoGenerateColumns="False"
+          CanUserResizeColumns="True"
+          CanUserSortColumns="True"
+          GridLinesVisibility="All"
+          HorizontalAlignment="Center"
+          VerticalScrollBarVisibility="Auto"
+          HorizontalScrollBarVisibility="Auto"
+          BorderThickness="1"
+          BorderBrush="Gray"
+          CornerRadius="10"
+          IsReadOnly="True">
 
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="Name"
+											Binding="{Binding MenuName}" />
+
+						<DataGridTextColumn Header="Price (₱)"
+											Binding="{Binding MenuPrice, StringFormat='₱{0:F2}'}" />
+
+						<DataGridTextColumn Header="Size"
+											Binding="{Binding Size}" />
+
+						<DataGridTextColumn Header="Category"
+											Binding="{Binding Category.CtgryName}" />
+
+						<DataGridCheckBoxColumn Header="Has Drink"
+												Binding="{Binding HasDrink}" />
+
+						<DataGridCheckBoxColumn Header="Has Add-On"
+												Binding="{Binding HasAddOn}" />
+
+						<DataGridCheckBoxColumn Header="Is Add-On"
+												Binding="{Binding IsAddOn}" />
+
+						<DataGridCheckBoxColumn Header="Available"
+												Binding="{Binding MenuIsAvailable}" />
+
+						<!-- Optional Action column (if needed for buttons) -->
+						<DataGridTemplateColumn Header="Action">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal" Spacing="5">
+										<Button Content="Edit" 
+												Tag="{Binding}"
+												Click="EditButton_Click"
+												Background="Blue"/>
+										<Button Content="Delete" 
+                                                Tag="{Binding}"
+                                                Click="DeleteButton_Click"
+                                                Background="Red"/>
+									</StackPanel>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+
+					</DataGrid.Columns>
+				</DataGrid>
+
+			</Grid>
+			<!-- Loading Overlay -->
+			<Grid Grid.Row="0" Grid.RowSpan="3"
+                  Background="#80000000"
+                  IsVisible="{Binding IsLoading}">
+				<StackPanel VerticalAlignment="Center"
+                          HorizontalAlignment="Center"
+                          Spacing="10">
+					<ProgressBar IsIndeterminate="True"/>
+					<TextBlock Text="Loading..."
+                             Foreground="White"
+                             HorizontalAlignment="Center"/>
+				</StackPanel>
 			</Grid>
 		</Grid>
 	</Border>

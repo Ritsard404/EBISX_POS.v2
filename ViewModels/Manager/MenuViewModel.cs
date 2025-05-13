@@ -1,4 +1,3 @@
-
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using EBISX_POS.API.Models;
@@ -11,6 +10,9 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
+using Tmds.DBus.Protocol;
+using Avalonia.Collections;
+using System.Linq;
 
 namespace EBISX_POS.ViewModels.Manager
 {
@@ -20,7 +22,7 @@ namespace EBISX_POS.ViewModels.Manager
         private readonly Window _window;
 
         [ObservableProperty]
-        private ObservableCollection<API.Models.Menu> _menus = new();
+        private ObservableCollection<API.Models.Menu> _menus = new ObservableCollection<API.Models.Menu>();
 
         [ObservableProperty]
         private API.Models.Menu? _selectedMenu;
@@ -32,6 +34,8 @@ namespace EBISX_POS.ViewModels.Manager
         {
             _window = window ?? throw new ArgumentNullException(nameof(window));
             _menuService = menu ?? throw new ArgumentNullException(nameof(menu));
+
+            _ = LoadMenus();
         }
 
         private async Task LoadMenus()
@@ -42,16 +46,21 @@ namespace EBISX_POS.ViewModels.Manager
                 var menus = await _menuService.GetAllMenus();
                 if (menus != null)
                 {
+                    // Clear and update the collection
                     Menus.Clear();
                     foreach (var menu in menus)
                     {
                         Menus.Add(menu);
                     }
+                    
+                    // Force collection update
+                    OnPropertyChanged(nameof(Menus));
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error loading Menus: {ex}");
+                ShowError("Failed to load menus. Please try again.");
             }
             finally
             {
@@ -59,44 +68,44 @@ namespace EBISX_POS.ViewModels.Manager
             }
         }
 
-        private async void SaveCategoryChanges(API.Models.Menu menu)
+        public async Task RemoveMenu(API.Models.Menu menu)
         {
             if (menu == null) return;
 
             try
             {
-                var (isSuccess, message) = await _menuService.UpdateMenu(menu, "EBISX@POS.com");
+                var box = MessageBoxManager.GetMessageBoxStandard(
+                    new MessageBoxStandardParams
+                    {
+                        ContentHeader = $"Menu Deletion",
+                        ContentMessage = "Press Ok to proceed deletion.",
+                        ButtonDefinitions = ButtonEnum.OkCancel,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        CanResize = false,
+                        SizeToContent = SizeToContent.WidthAndHeight,
+                        Width = 400,
+                        ShowInCenter = true,
+                        SystemDecorations=SystemDecorations.BorderOnly,
+                        Icon = Icon.Warning
+                    });
 
-                if (isSuccess)
+                var result = await box.ShowAsPopupAsync(_window);
+                if(result == ButtonResult.Ok)
                 {
-                    await LoadMenus();
-                    //await ShowSuccess(message);
+                    var (isSuccess, message) = await _menuService.DeleteMenu(menu.Id, "EBISX@POS.com");
+
+                    if (isSuccess)
+                    {
+                        // Remove from collection and force update
+                        Menus.Remove(menu);
+                        OnPropertyChanged(nameof(Menus));
+                        await ShowSuccess(message);
+                        return;
+                    }
+
+                    ShowError(message);
                     return;
                 }
-                ShowError(message);
-                return;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error saving user changes: {ex}");
-            }
-        }
-
-        public async Task RemoveMenu()
-        {
-            if (SelectedMenu == null) return;
-
-            try
-            {
-                var (isSuccess, message) = await _menuService.DeleteMenu(SelectedMenu.Id, "EBISX@POS.com");
-
-                if (isSuccess)
-                {
-                    await LoadMenus();
-                    await ShowSuccess(message);
-                    return;
-                }
-                ShowError(message);
                 return;
             }
             catch (Exception ex)
@@ -116,11 +125,29 @@ namespace EBISX_POS.ViewModels.Manager
         {
             var window = new AddMenuWindow();
             window.DataContext = new AddMenuViewModel(_menuService, window);
-            await window.ShowDialog(_window);
-            await LoadMenus();
+            var result = await window.ShowDialog<bool?>(_window);
+            
+            if (result == true)
+            {
+                Debug.WriteLine("New menu added successfully.");
+                await LoadMenus();
+            }
         }
 
-        private async void ShowError(string message)
+        public async Task EditMenu(API.Models.Menu menu)
+        {
+            var window = new AddMenuWindow();
+            window.DataContext = new AddMenuViewModel(_menuService, window, menu);
+            var result = await window.ShowDialog<bool?>(_window);
+            
+            if (result == true)
+            {
+                Debug.WriteLine($"Menu {menu.MenuName} updated successfully.");
+                await LoadMenus();
+            }
+        }
+
+        private void ShowError(string message)
         {
             var msgBox = MessageBoxManager
                 .GetMessageBoxStandard(new MessageBoxStandardParams
@@ -131,7 +158,7 @@ namespace EBISX_POS.ViewModels.Manager
                     Icon = Icon.Error
                 });
 
-            await msgBox.ShowAsPopupAsync(_window);
+            msgBox.ShowAsPopupAsync(_window);
         }
 
         private async Task ShowSuccess(string message)

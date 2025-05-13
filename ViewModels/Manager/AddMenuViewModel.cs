@@ -16,7 +16,7 @@ using System.IO;
 namespace EBISX_POS.ViewModels.Manager
 {
     /// <summary>
-    /// ViewModel for adding new menu items to the system
+    /// ViewModel for adding or editing menu items in the system
     /// </summary>
     public partial class AddMenuViewModel : ObservableObject
     {
@@ -54,19 +54,26 @@ namespace EBISX_POS.ViewModels.Manager
         [ObservableProperty]
         private Bitmap? _selectedImage;
 
+        [ObservableProperty]
+        private bool _isEditMode;
+
+        [ObservableProperty]
+        private string _windowTitle = "Add New Menu";
+
         /// <summary>
         /// Initializes a new instance of the AddMenuViewModel
         /// </summary>
         /// <param name="menuService">Service for menu operations</param>
         /// <param name="window">Parent window for dialogs</param>
+        /// <param name="menuToEdit">Optional menu item to edit</param>
         /// <exception cref="ArgumentNullException">Thrown when menuService or window is null</exception>
-        public AddMenuViewModel(IMenu menuService, Window window)
+        public AddMenuViewModel(IMenu menuService, Window window, API.Models.Menu? menuToEdit = null)
         {
             _menuService = menuService ?? throw new ArgumentNullException(nameof(menuService));
             _window = window ?? throw new ArgumentNullException(nameof(window));
 
-            // Initialize MenuDetails with default values
-            MenuDetails = new API.Models.Menu
+            // Initialize MenuDetails with default values or edit values
+            MenuDetails = menuToEdit ?? new API.Models.Menu
             {
                 MenuName = string.Empty,
                 MenuPrice = 0,
@@ -79,8 +86,38 @@ namespace EBISX_POS.ViewModels.Manager
                 AddOnType = new AddOnType { Id = 0, AddOnTypeName = "" }
             };
 
+            // Set edit mode if menuToEdit is provided
+            IsEditMode = menuToEdit != null;
+            WindowTitle = IsEditMode ? "Edit Menu" : "Add New Menu";
+
             // Load initial data
             _ = LoadCombos();
+
+            // Load image if in edit mode and image path exists
+            if (IsEditMode && !string.IsNullOrEmpty(MenuDetails.MenuImagePath))
+            {
+                _ = LoadExistingImage();
+            }
+        }
+
+        private async Task LoadExistingImage()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(MenuDetails?.MenuImagePath)) return;
+
+                using var stream = File.OpenRead(MenuDetails.MenuImagePath);
+                var bitmap = await Task.Run(() => Bitmap.DecodeToWidth(stream, 300));
+                if (bitmap != null)
+                {
+                    SelectedImage = bitmap;
+                    OnPropertyChanged(nameof(SelectedImage));
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading existing image: {ex}");
+            }
         }
 
         /// <summary>
@@ -98,7 +135,6 @@ namespace EBISX_POS.ViewModels.Manager
                 var adds = await _menuService.GetAddOnTypes();
 
                 // 2) Insert a "blank" entry at index 0
-                cats?.Insert(0, new Category { Id = 0, CtgryName = "" });
                 drks?.Insert(0, new DrinkType { Id = 0, DrinkTypeName = "" });
                 adds?.Insert(0, new AddOnType { Id = 0, AddOnTypeName = "" });
 
@@ -145,20 +181,6 @@ namespace EBISX_POS.ViewModels.Manager
             if (MenuDetails.Category == null || MenuDetails.Category.Id == 0)
             {
                 ShowError("Please select a category");
-                return false;
-            }
-
-            // Validate drink type if HasDrink is true
-            if (MenuDetails.HasDrink && (MenuDetails.DrinkType == null || MenuDetails.DrinkType.Id == 0))
-            {
-                ShowError("Please select a drink type when HasDrink is enabled");
-                return false;
-            }
-
-            // Validate add-on type if HasAddOn is true
-            if (MenuDetails.HasAddOn && (MenuDetails.AddOnType == null || MenuDetails.AddOnType.Id == 0))
-            {
-                ShowError("Please select an add-on type when HasAddOn is enabled");
                 return false;
             }
 
@@ -217,10 +239,10 @@ namespace EBISX_POS.ViewModels.Manager
         }
 
         /// <summary>
-        /// Command to add a new menu item
+        /// Command to save menu changes (add or edit)
         /// </summary>
         [RelayCommand]
-        private async Task AddMenu()
+        private async Task SaveMenu()
         {
             if (IsLoading) return;
 
@@ -233,14 +255,15 @@ namespace EBISX_POS.ViewModels.Manager
             {
                 IsLoading = true;
 
-                var newMenu = new API.Models.Menu
+                var menuToSave = new API.Models.Menu
                 {
-                    MenuName = MenuDetails!.MenuName,
+                    Id = MenuDetails!.Id,
+                    MenuName = MenuDetails.MenuName,
                     MenuPrice = MenuDetails.MenuPrice,
                     Category = MenuDetails.Category,
                     Size = MenuDetails.Size,
-                    DrinkType = MenuDetails.DrinkType,
-                    AddOnType = MenuDetails.AddOnType,
+                    DrinkType = MenuDetails.DrinkType == null || MenuDetails.DrinkType.Id == 0 ? null : MenuDetails.DrinkType,
+                    AddOnType = MenuDetails.AddOnType == null || MenuDetails.AddOnType.Id == 0 ? null : MenuDetails.AddOnType,
                     HasAddOn = MenuDetails.HasAddOn,
                     HasDrink = MenuDetails.HasDrink,
                     IsAddOn = MenuDetails.IsAddOn,
@@ -248,22 +271,23 @@ namespace EBISX_POS.ViewModels.Manager
                     MenuIsAvailable = MenuDetails.MenuIsAvailable
                 };
 
-                var (isSuccess, message, _) = await _menuService.AddMenu(newMenu, DEFAULT_USER);
+                var (isSuccess, message) = IsEditMode
+                    ? await _menuService.UpdateMenu(menuToSave, DEFAULT_USER)
+                    : await _menuService.AddMenu(menuToSave, DEFAULT_USER);
 
                 if (isSuccess)
                 {
                     await ShowSuccess(message);
-                    _window.Close();
+                    _window.Close(true);
+                    return;
                 }
-                else
-                {
-                    await ShowError(message);
-                }
+
+                await ShowError(message);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error adding menu: {ex}");
-                await ShowError("Failed to add menu. Please try again.");
+                Debug.WriteLine($"Error saving menu: {ex}");
+                await ShowError("Failed to save menu. Please try again.");
             }
             finally
             {
@@ -277,10 +301,10 @@ namespace EBISX_POS.ViewModels.Manager
         [RelayCommand]
         private void Cancel()
         {
-            _window.Close();
+            _window.Close(false);
         }
-        [RelayCommand]
 
+        [RelayCommand]
         private void ClearImage()
         {
             SelectedImage = null;

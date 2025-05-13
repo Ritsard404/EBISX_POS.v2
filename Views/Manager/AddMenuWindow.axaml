@@ -2,21 +2,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="550"
-		Width="500" Height="550"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+		Width="500" Height="500"
         x:Class="EBISX_POS.AddMenuWindow"
         xmlns:vm="using:EBISX_POS.ViewModels.Manager"
         x:DataType="vm:AddMenuViewModel"
-        Title="AddMenuWindow"
+        Title="{Binding WindowTitle}"
         WindowStartupLocation="CenterScreen"
         SystemDecorations="None"
         CornerRadius="10">
 
 	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
-
 		<Grid RowDefinitions="Auto,*,Auto" Margin="20">
+
 			<TextBlock Grid.Row="0"
-                      Text="Add New Menu"
+                      Text="{Binding WindowTitle}"
                       FontSize="20"
                       FontWeight="Bold"
                       Margin="0,0,0,20"/>
@@ -26,9 +26,10 @@
 				Orientation="Vertical"
 				Spacing="15"
 				HorizontalAlignment="Center"
+				VerticalAlignment="Center"
 				Margin="0,20">
 
-				<StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" VerticalAlignment="Center">
 					<Grid>
 						<Button
 						  Width="150"
@@ -72,7 +73,7 @@
 					  Watermark="Name"
 					  Text="{Binding MenuDetails.MenuName, UpdateSourceTrigger=PropertyChanged}"/>
 					<TextBox
-					  Width="100"
+					  Width="200"
 					  Watermark="Price"
 					  Text="{Binding MenuDetails.MenuPrice, UpdateSourceTrigger=PropertyChanged}"/>
 				</StackPanel>
@@ -87,7 +88,7 @@
 					  PlaceholderText="Select Category"
 					  MaxDropDownHeight="100"/>
 					<ComboBox
-					  Width="150"
+					  Width="200"
 					  ItemsSource="{Binding DrinkSizes}"
 					  SelectedItem="{Binding MenuDetails.Size}"
 					  PlaceholderText="Select Size"
@@ -115,16 +116,19 @@
 				<!-- Row 4: Flags -->
 				<StackPanel Orientation="Horizontal" Spacing="10">
 					<ToggleButton
-					  Width="100"
+					  Width="130"
 					  Content="Has Add-On"
+					  HorizontalContentAlignment="Center"
 					  IsChecked="{Binding MenuDetails.HasAddOn}"/>
 					<ToggleButton
-					  Width="100"
+					  Width="130"
 					  Content="Has Drink"
+					  HorizontalContentAlignment="Center"
 					  IsChecked="{Binding MenuDetails.HasDrink}"/>
 					<ToggleButton
-					  Width="100"
+					  Width="130"
 					  Content="Is Add-On"
+					  HorizontalContentAlignment="Center"
 					  IsChecked="{Binding MenuDetails.IsAddOn}"/>
 				</StackPanel>
 
@@ -138,9 +142,23 @@
 				<Button Content="Cancel"
                         Padding="20,5"
 						Command="{Binding CancelCommand}"/>
-				<Button Content="Add Category"
-                        Padding="20,5"/>
+				<Button Content="{Binding IsEditMode, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Save Menu|Add Menu'}"
+                        Padding="20,5"
+						Command="{Binding SaveMenuCommand}"/>
 			</StackPanel>
+			<!-- Loading Overlay -->
+			<Grid Grid.Row="0" Grid.RowSpan="3"
+                  Background="#80000000"
+                  IsVisible="{Binding IsLoading}">
+				<StackPanel VerticalAlignment="Center"
+                          HorizontalAlignment="Center"
+                          Spacing="10">
+					<ProgressBar IsIndeterminate="True"/>
+					<TextBlock Text="Loading..."
+                             Foreground="White"
+                             HorizontalAlignment="Center"/>
+				</StackPanel>
+			</Grid>
 		</Grid>
 	</Border>
 </Window>
