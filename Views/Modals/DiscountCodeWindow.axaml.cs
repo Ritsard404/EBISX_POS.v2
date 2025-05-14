@@ -57,6 +57,7 @@ namespace EBISX_POS.Views
                     ShowInCenter = true,
                     Icon = MsBox.Avalonia.Enums.Icon.Error
                 }).ShowAsPopupAsync(this);
+                Close();
                 return;
             }
 
@@ -96,6 +97,7 @@ namespace EBISX_POS.Views
                     ShowInCenter = true,
                     Icon = MsBox.Avalonia.Enums.Icon.Error
                 }).ShowAsPopupAsync(this);
+                Close();
                 return;
             }
 
@@ -122,6 +124,7 @@ namespace EBISX_POS.Views
                         ShowInCenter = true,
                         Icon = MsBox.Avalonia.Enums.Icon.Error
                     }).ShowAsPopupAsync(this);
+                    Close();
                     return;
                 }
             }

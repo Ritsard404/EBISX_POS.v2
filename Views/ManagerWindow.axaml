@@ -71,10 +71,14 @@
 									   Margin="5,0,0,0"/>
 						</StackPanel>
 					</Button>
-					<TextBlock Text="Point of Sale"
-							   VerticalAlignment="Center"
-							   FontSize="20" FontWeight="Bold"
-							   Margin="20,0,0,0"/>
+					<TextBlock VerticalAlignment="Center"
+						   FontSize="20"
+						   FontWeight="Bold"
+						   Grid.Column="0"
+						   Margin="20,0,0,0" >
+						<Run Text="Powered by " />
+						<Run Text="EBISX" Foreground="SkyBlue"/>
+					</TextBlock>
 				</StackPanel>
 				<!-- User Name -->
 				<TextBlock Grid.Column="2"

@@ -286,7 +286,7 @@ namespace EBISX_POS.Views
             await refundOrder.ShowDialog(this);
         }
 
-        private async void LogOut_Button_Click(object? sender, RoutedEventArgs e)
+        private async void LogOut_Button(object? sender, RoutedEventArgs e)
         {
             // 1. Early‑exit if there are pending items
             if (OrderState.CurrentOrder.Any())

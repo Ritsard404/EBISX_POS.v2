@@ -13,8 +13,10 @@
 		SystemDecorations="None">
 
 	<!--<Design.DataContext>
-		--><!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) --><!--
+		-->
+	<!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+	<!--
 		<vm:MainWindowViewModel/>
 	</Design.DataContext>-->
 
@@ -23,12 +25,14 @@
 		<Border BorderBrush="Orange" BorderThickness="0,0,0,3">
 			<Grid Grid.Row="0" Height="70" ColumnDefinitions="Auto, Auto, *, Auto">
 				<!-- Title -->
-				<TextBlock Grid.Column="0"
-						   Text="Point of Sale"
-						   VerticalAlignment="Center"
-						   FontSize="20"
-						   FontWeight="Bold"
-						   Margin="20,0,0,0" />
+				<TextBlock VerticalAlignment="Center"
+					   FontSize="20"
+					   FontWeight="Bold" 
+					   Grid.Column="0"
+					   Margin="20,0,0,0" >
+					<Run Text="Powered by " />
+					<Run Text="EBISX" Foreground="SkyBlue"/>
+				</TextBlock>
 
 				<!-- Connection Status -->
 				<TextBlock Grid.Column="1"
@@ -199,7 +203,7 @@
 											   FontWeight="Black"/>
 								</StackPanel>
 							</Button>
-							
+
 							<Button FontSize="18" Width="130" Grid.Column="2" FontWeight="ExtraBold" Margin="10"
                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                     VerticalContentAlignment="Center" Click="OrderType_Click"  HorizontalContentAlignment="Center">
