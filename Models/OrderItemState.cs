@@ -24,7 +24,10 @@ namespace EBISX_POS.Models
         [ObservableProperty]
         private decimal totalPrice;
 
-        public decimal TotalDiscountPrice { get; set; }
+        [ObservableProperty]
+        private decimal totalDiscountPrice;
+
+        //public decimal TotalDiscountPrice { get; set; }
         public bool HasDiscount { get; set; }
         public bool HasPwdScDiscount { get; set; }
         public bool IsEnableEdit { get; set; } = true;
@@ -76,6 +79,7 @@ namespace EBISX_POS.Models
             OnPropertyChanged(nameof(DisplaySubOrders));
             OnPropertyChanged(nameof(Quantity));
             UpdateTotalPrice();
+            UpdateTotalDiscountPrice();
         }
 
         public void RefreshDisplaySubOrders(bool regenerateId = false)
@@ -88,6 +92,20 @@ namespace EBISX_POS.Models
             OnPropertyChanged(nameof(DisplaySubOrders));
             UpdateTotalPrice();
             UpdateHasCurrentOrder();
+        }
+
+        private void UpdateTotalDiscountPrice()
+        {
+            // Apply senior discount: flat ₱250 if total >= ₱250, otherwise 12% of total
+            if (TotalPrice >= 250m)
+            {
+                TotalDiscountPrice = 250m;
+            }
+            else
+            {
+                TotalDiscountPrice = Math.Round(TotalPrice * 0.12m, 2);
+            }
+            OnPropertyChanged(nameof(TotalDiscountPrice));
         }
 
         private void UpdateHasCurrentOrder()
