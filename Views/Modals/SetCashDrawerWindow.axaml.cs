@@ -98,7 +98,7 @@ namespace EBISX_POS.Views
                     .GetMessageBoxStandard("Invalid Input", "Input field is required.", ButtonEnum.Ok)
                     .ShowAsPopupAsync(this);
 
-                Close();
+                Close(false);
                 return;
             }
 
@@ -110,7 +110,7 @@ namespace EBISX_POS.Views
                         .GetMessageBoxStandard("Invalid Input", "Please enter a valid Order ID.", ButtonEnum.Ok)
                         .ShowAsPopupAsync(this);
 
-                    Close();
+                    Close(false);
                     return;
                 }
 
@@ -120,7 +120,7 @@ namespace EBISX_POS.Views
                         .GetMessageBoxStandard("Invalid Input", "Manager email is required.", ButtonEnum.Ok)
                         .ShowAsPopupAsync(this);
 
-                    Close();
+                    Close(false);
                     return;
                 }
 
@@ -136,11 +136,11 @@ namespace EBISX_POS.Views
 
                     StartButton.IsEnabled = true;
 
-                    Close();
+                    Close(false);
                     return;
                 }
 
-                Close();
+                Close(true);
                 return;
             }
 
@@ -160,7 +160,7 @@ namespace EBISX_POS.Views
                     .GetMessageBoxStandard("Invalid Input", "Manager email is required.", ButtonEnum.Ok)
                     .ShowAsPopupAsync(this);
 
-                Close();
+                Close(false);
                 return;
             }
 
@@ -188,7 +188,7 @@ namespace EBISX_POS.Views
 
                 StartButton.IsEnabled = true;
 
-                Close();
+                Close(false);
                 return;
             }
 
@@ -204,7 +204,7 @@ namespace EBISX_POS.Views
                 })
                 .ShowAsPopupAsync(this);
 
-            Close();
+            Close(true);
         }
     }
 }

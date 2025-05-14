@@ -286,63 +286,102 @@ namespace EBISX_POS.Views
             await refundOrder.ShowDialog(this);
         }
 
-        private async void LogOut_Button(object? sender, RoutedEventArgs e)
+        private async void LogOut_Button_Click(object? sender, RoutedEventArgs e)
         {
+            // 1. Early‑exit if there are pending items
             if (OrderState.CurrentOrder.Any())
             {
+                await MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                {
+                    ContentHeader = "Error",
+                    ContentMessage = "Unable to log out – there is a pending order.",
+                    ButtonDefinitions = ButtonEnum.Ok,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    CanResize = false,
+                    SizeToContent = SizeToContent.WidthAndHeight,
+                    Width = 400,
+                    ShowInCenter = true,
+                    Icon = MsBox.Avalonia.Enums.Icon.Error
+                }).ShowAsPopupAsync(this);
 
-                await MessageBoxManager.GetMessageBoxStandard(
-                    new MessageBoxStandardParams
-                    {
-                        ContentHeader = $"Error",
-                        ContentMessage = "Unable to log out – there is a pending order.",
-                        ButtonDefinitions = ButtonEnum.Ok, // Defines the available buttons
-                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                        CanResize = false,
-                        SizeToContent = SizeToContent.WidthAndHeight,
-                        Width = 400,
-                        ShowInCenter = true,
-                        Icon = MsBox.Avalonia.Enums.Icon.Error
-                    }).ShowAsPopupAsync(this);
                 return;
             }
 
             ShowLoader(true);
-
-            var swipeManager = new ManagerSwipeWindow(header: "Manager Authorization", message: "Please enter your manager email.", ButtonName: "Submit");
-            var (success, email) = await swipeManager.ShowDialogAsync(this);
-            if (success)
+            try
             {
+                // 2. Manager authorization step
+                var swipeManager = new ManagerSwipeWindow(
+                    header: "Manager Authorization",
+                    message: "Please enter your manager email.",
+                    ButtonName: "Submit"
+                );
 
-                var setCashDrawer = new SetCashDrawerWindow("Cash-Out");
-                await setCashDrawer.ShowDialog(this);
+                var (authorized, managerEmail) = await swipeManager.ShowDialogAsync(this);
+                if (!authorized)
+                    return;
 
+                // 3. Cash‑out step
+                var cashOutWindow = new SetCashDrawerWindow("Cash‑Out");
+                bool drawerOk = await cashOutWindow.ShowDialog<bool>(this);
+
+                if (!drawerOk)
+                {
+                    // user canceled or operation failed
+                    ShowLoader(false);
+                    return;
+                }
+
+                // 4. Print X‑reading
                 ReceiptPrinterUtil.PrintXReading(_serviceProvider!);
 
-                // Open the TenderOrderWindow
-                var (isSuccess, Message) = await _authService.LogOut(email);
-                if (isSuccess)
+                // 5. Call the API to log out
+                var (logoutSuccess, logoutMessage) = await _authService.LogOut(managerEmail);
+                if (!logoutSuccess)
                 {
-                    Debug.WriteLine("Log out successful");
-                    CashierState.CashierName = null;
-                    CashierState.CashierEmail = null;
-                    OrderState.CurrentOrder.Clear();
-                    OrderState.CurrentOrderItem = new OrderItemState();
-                    TenderState.tenderOrder.Reset();
-
-                    var logInWindow = new LogInWindow();
-                    if (Application.Current.ApplicationLifetime
-                        is IClassicDesktopStyleApplicationLifetime desktop)
+                    await MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
                     {
-                        desktop.MainWindow = logInWindow;
-                    }
-                    logInWindow.Show();
-                    Close();
-                    ShowLoader(false);
+                        ContentHeader = "Logout Failed",
+                        ContentMessage = logoutMessage,
+                        ButtonDefinitions = ButtonEnum.Ok,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        Icon = MsBox.Avalonia.Enums.Icon.Error
+                    }).ShowAsPopupAsync(this);
+                    return;
                 }
+
+                // 6. Clear application state
+                CashierState.CashierName = null;
+                CashierState.CashierEmail = null;
+                OrderState.CurrentOrder.Clear();
+                OrderState.CurrentOrderItem = new OrderItemState();
+                TenderState.tenderOrder.Reset();
+
+                // 7. Swap to login window
+                var loginWindow = new LogInWindow();
+                if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    desktop.MainWindow = loginWindow;
+                }
+                loginWindow.Show();
+                Close();
             }
-            ShowLoader(false);
-            return;
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Logout error: {ex}");
+                await MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                {
+                    ContentHeader = "Unexpected Error",
+                    ContentMessage = "An error occurred while logging out. Please try again.",
+                    ButtonDefinitions = ButtonEnum.Ok,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Icon = MsBox.Avalonia.Enums.Icon.Error
+                }).ShowAsPopupAsync(this);
+            }
+            finally
+            {
+                ShowLoader(false);
+            }
         }
         private async void ChangeMode_Button(object? sender, RoutedEventArgs e)
         {
