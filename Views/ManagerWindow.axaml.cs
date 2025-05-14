@@ -168,6 +168,7 @@ namespace EBISX_POS.Views
             }
 
             nextWindow.Show();
+            CashierState.ManagerEmail = null;
             Close();
         }
 
@@ -340,6 +341,7 @@ namespace EBISX_POS.Views
                     ShowLoader(false);
                 }
             }
+            ShowLoader(false);
             return;
         }
         private async void ChangeMode_Button(object? sender, RoutedEventArgs e)
