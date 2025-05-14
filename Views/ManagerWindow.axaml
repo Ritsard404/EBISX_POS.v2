@@ -241,11 +241,22 @@
 								<Button Classes="myButton"
 										Click="LoadData_Click"
 										Grid.Column="0"
-										IsEnabled="False">
+										IsVisible="False">
 									<StackPanel VerticalAlignment="Center"
 												Orientation="Vertical"
 												Spacing="5">
 										<TextBlock FontSize="30" Text="Load Data"/>
+									</StackPanel>
+								</Button>
+
+								<Button Classes="myButton"
+										Grid.Column="0"
+										x:Name="PosInfo"
+												Tag="PosTerminalInfo" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="POS Info"/>
 									</StackPanel>
 								</Button>
 

@@ -21,6 +21,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia;
 using Avalonia.Interactivity;
 using EBISX_POS.API.Services.Interfaces;
+using EBISX_POS.v2.Views;
 
 namespace EBISX_POS.Views
 {
@@ -68,6 +69,8 @@ namespace EBISX_POS.Views
 
             // disable LogOut for managers (since they’d go back to login instead)
             LogOut.IsEnabled = !hasManager;
+
+            PosInfo.IsEnabled = CashierState.ManagerEmail == "EBISX@POS.com";
         }
         public ManagerWindow() : this(App.Current.Services.GetRequiredService<IServiceProvider>())
         { }
@@ -397,6 +400,7 @@ namespace EBISX_POS.Views
                 case "Category": OpenCategory(); return;
                 case "Menu": OpenMenu(); return;
                 case "CouponAndPromo": OpenCouponAndPromo(); return;
+                case "PosTerminalInfo": OpenPosTerminalInfo(); return;
             }
         }
 
@@ -424,6 +428,11 @@ namespace EBISX_POS.Views
         {
             var couponPromoWindow = new CouponPromoWindow();
             couponPromoWindow.ShowDialog(this);
+        }
+        void OpenPosTerminalInfo()
+        {
+            var posTerminalInfoWindow = new PosTerminalInfoView();
+            posTerminalInfoWindow.ShowDialog(this);
         }
     }
 }
