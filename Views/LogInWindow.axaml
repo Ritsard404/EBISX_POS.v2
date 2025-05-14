@@ -66,6 +66,7 @@
 						 Watermark="Manager Auth"
 						 UseFloatingWatermark="True"
 						 Height="40"
+						 PasswordChar="*"
 						 RevealPassword="False"/>
 
 				<Button Content="Sign In"

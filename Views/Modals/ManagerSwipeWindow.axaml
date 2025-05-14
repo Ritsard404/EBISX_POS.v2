@@ -43,6 +43,7 @@
                          FontFamily="{StaticResource NunitoFont}"
                          FontSize="16"
                          Margin="0,0,0,5"
+						 PasswordChar="*"
 						 RevealPassword="False"/>
                 <TextBlock x:Name="ValidationTextBlock"
                           Foreground="Red"
