@@ -307,59 +307,62 @@ namespace EBISX_POS.Views
                 return;
             }
 
-            var box = MessageBoxManager.GetMessageBoxStandard(
-                new MessageBoxStandardParams
-                {
-                    ContentHeader = $"Log Out",
-                    ContentMessage = "Please ask the manager to swipe.",
-                    ButtonDefinitions = ButtonEnum.OkCancel, // Defines the available buttons
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    CanResize = false,
-                    SizeToContent = SizeToContent.WidthAndHeight,
-                    Width = 400,
-                    ShowInCenter = true,
-                    Icon = MsBox.Avalonia.Enums.Icon.Warning
-                });
+            //var box = MessageBoxManager.GetMessageBoxStandard(
+            //    new MessageBoxStandardParams
+            //    {
+            //        ContentHeader = $"Log Out",
+            //        ContentMessage = "Please ask the manager to swipe.",
+            //        ButtonDefinitions = ButtonEnum.OkCancel, // Defines the available buttons
+            //        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            //        CanResize = false,
+            //        SizeToContent = SizeToContent.WidthAndHeight,
+            //        Width = 400,
+            //        ShowInCenter = true,
+            //        Icon = MsBox.Avalonia.Enums.Icon.Warning
+            //    });
 
-            var managerEmail = "user1@example.com";
+            //var result = await box.ShowAsPopupAsync(this);
+            //switch (result)
+            //{
+            //    case ButtonResult.Ok:
 
-            var result = await box.ShowAsPopupAsync(this);
-            switch (result)
+            ShowLoader(true);
+
+            var swipeManager = new ManagerSwipeWindow(header: "Manager Authorization", message: "Please enter your manager email.", ButtonName: "Submit");
+            var (success, email) = await swipeManager.ShowDialogAsync(this);
+
+            var setCashDrawer = new SetCashDrawerWindow("Cash-Out");
+            await setCashDrawer.ShowDialog(this);
+
+            ReceiptPrinterUtil.PrintXReading(_serviceProvider!);
+
+            // Open the TenderOrderWindow
+            var (isSuccess, Message) = await _authService.LogOut(email);
+            if (isSuccess)
             {
-                case ButtonResult.Ok:
+                Debug.WriteLine("Log out successful");
+                CashierState.CashierName = null;
+                CashierState.CashierEmail = null;
+                OrderState.CurrentOrder.Clear();
+                OrderState.CurrentOrderItem = new OrderItemState();
+                TenderState.tenderOrder.Reset();
 
-                    ShowLoader(true);
-                    var setCashDrawer = new SetCashDrawerWindow("Cash-Out");
-                    await setCashDrawer.ShowDialog(this);
-
-                    ReceiptPrinterUtil.PrintXReading(_serviceProvider!);
-
-                    // Open the TenderOrderWindow
-                    var (isSuccess, Message) = await _authService.LogOut(managerEmail);
-                    if (isSuccess)
-                    {
-                        CashierState.CashierName = null;
-                        CashierState.CashierEmail = null;
-                        OrderState.CurrentOrder.Clear();
-                        OrderState.CurrentOrderItem = new OrderItemState();
-                        TenderState.tenderOrder.Reset();
-
-                        var logInWindow = new LogInWindow();
-                        if (Application.Current.ApplicationLifetime
-                            is IClassicDesktopStyleApplicationLifetime desktop)
-                        {
-                            desktop.MainWindow = logInWindow;
-                        }
-                        logInWindow.Show();
-                        ShowLoader(false);
-                        Close();
-                    }
-                    return;
-                case ButtonResult.Cancel:
-                    return;
-                default:
-                    return;
+                var logInWindow = new LogInWindow();
+                if (Application.Current.ApplicationLifetime
+                    is IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    desktop.MainWindow = logInWindow;
+                }
+                logInWindow.Show();
+                ShowLoader(false);
+                Close();
             }
+            return;
+            //case ButtonResult.Cancel:
+            //    return;
+            //default:
+            //    return;
+            //}
 
         }
         private async void ChangeMode_Button(object? sender, RoutedEventArgs e)
