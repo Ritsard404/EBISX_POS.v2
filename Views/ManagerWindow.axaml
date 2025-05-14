@@ -193,14 +193,14 @@
 							  IsVisible="False"
 							  Background="#80000000"
 				  >
-					
+
 				</Grid>
-				
+
 				<!-- Bottom Keyboard -->
 				<Border Grid.Row="1" BorderBrush="Orange" Height="150" BorderThickness="0,0,3,0">
 					<!-- Keyboard content here -->
 					<StackPanel Orientation="Vertical" HorizontalAlignment="Center"  VerticalAlignment="Center">
-						<ToggleButton Classes="myButton" 
+						<ToggleButton Classes="myButton"
 										   Height="70"
 										   Width="170"
 										   FontSize="18"
@@ -230,12 +230,12 @@
 				<Border Grid.Row="0" BorderBrush="Orange" BorderThickness="0,0,0,3">
 					<ScrollViewer VerticalScrollBarVisibility="Auto">
 						<StackPanel Margin="10" x:Name="DataLayout" Spacing="10">
-							<TextBlock FontSize="30" 
-									 Text="Data Management" 
+							<TextBlock FontSize="30"
+									 Text="Data Management"
 									 HorizontalAlignment="Center"
 									 Margin="0,0,0,10"
 									 FontWeight="Bold"/>
-							
+
 							<!-- First Pair -->
 							<Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
 								<Button Classes="myButton"
@@ -249,34 +249,26 @@
 								</Button>
 
 								<Button Classes="myButton"
-										Grid.Column="1">
+										Grid.Column="1"
+												Tag="User" Click="OnBtnClick">
 									<StackPanel VerticalAlignment="Center"
 												Orientation="Vertical"
 												Spacing="5">
 										<TextBlock FontSize="30" Text="User"/>
-										<TextBlock FontSize="20" Text="Management"/>
 									</StackPanel>
 								</Button>
 							</Grid>
 
+
 							<!-- Second Pair -->
 							<Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
-								<Button Classes="myButton"
-										Grid.Column="0">
-									<StackPanel VerticalAlignment="Center"
-												Orientation="Vertical"
-												Spacing="5">
+								<Button Classes="myButton" Grid.Column="0" Tag="MenuTypes" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center" Orientation="Vertical" Spacing="5">
 										<TextBlock FontSize="30" Text="Menu Types"/>
-										<TextBlock FontSize="20" Text="Management"/>
 									</StackPanel>
 								</Button>
-
-								<Button Classes="myButton"
-										Grid.Column="1">
-									<StackPanel VerticalAlignment="Center"
-												Orientation="Vertical"
-												Spacing="5">
-										<TextBlock FontSize="30" Text="Menu"/>
+								<Button Classes="myButton" Grid.Column="1" Tag="Category" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center" Orientation="Vertical" Spacing="5">
 										<TextBlock FontSize="30" Text="Category"/>
 									</StackPanel>
 								</Button>
@@ -284,23 +276,15 @@
 
 							<!-- Third Pair -->
 							<Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
-								<Button Classes="myButton"
-										Grid.Column="0">
-									<StackPanel VerticalAlignment="Center"
-												Orientation="Vertical"
-												Spacing="5">
+								<Button Classes="myButton" Grid.Column="0" Tag="Menu" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center" Orientation="Vertical" Spacing="5">
 										<TextBlock FontSize="30" Text="Menu"/>
-										<TextBlock FontSize="20" Text="Management"/>
 									</StackPanel>
 								</Button>
-
-								<Button Classes="myButton"
-										Grid.Column="1">
-									<StackPanel VerticalAlignment="Center"
-												Orientation="Vertical"
-												Spacing="5">
-										<TextBlock FontSize="30" Text="Coupon"/>
-										<TextBlock FontSize="30" Text="And Promo"/>
+								<Button Classes="myButton" Grid.Column="1" Tag="CouponAndPromo" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center" Orientation="Vertical" Spacing="5">
+										<TextBlock FontSize="26" Text="Coupon"/>
+										<TextBlock FontSize="26" Text="And Promo"/>
 									</StackPanel>
 								</Button>
 							</Grid>

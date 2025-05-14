@@ -19,6 +19,8 @@ using EBISX_POS.ViewModels.Manager;
 using System.Threading.Tasks;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia;
+using Avalonia.Interactivity;
+using EBISX_POS.API.Services.Interfaces;
 
 namespace EBISX_POS.Views
 {
@@ -29,6 +31,7 @@ namespace EBISX_POS.Views
         private readonly IServiceProvider? _serviceProvider;
         private readonly MenuService _menuService;
         private readonly AuthService _authService;
+        private readonly IData _data;
 
         // Constructor with IServiceProvider parameter
         public ManagerWindow(IServiceProvider serviceProvider)
@@ -44,6 +47,7 @@ namespace EBISX_POS.Views
             _cashTrackReportPath = serviceProvider
                                         .GetRequiredService<IOptions<SalesReport>>()
                                         .Value.CashTrackReport;
+            _data = serviceProvider.GetRequiredService<IData>();
 
             // cache these checks so you only call them once
             bool hasManager = !string.IsNullOrWhiteSpace(CashierState.ManagerEmail);
@@ -275,13 +279,13 @@ namespace EBISX_POS.Views
                 })
                 .ShowWindowDialogAsync(this);
 
-        private async void Refund_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private async void Refund_Click(object? sender, RoutedEventArgs e)
         {
             var refundOrder = new SetCashDrawerWindow("Returned");
             await refundOrder.ShowDialog(this);
         }
 
-        private async void LogOut_Button(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private async void LogOut_Button(object? sender, RoutedEventArgs e)
         {
             if (OrderState.CurrentOrder.Any())
             {
@@ -357,7 +361,7 @@ namespace EBISX_POS.Views
             }
 
         }
-        private async void ChangeMode_Button(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private async void ChangeMode_Button(object? sender, RoutedEventArgs e)
         {
             ShowLoader(true);
             if (string.IsNullOrWhiteSpace(CashierState.ManagerEmail))
@@ -385,6 +389,44 @@ namespace EBISX_POS.Views
             ShowLoader(false);
         }
 
+        private void OnBtnClick(object? sender, RoutedEventArgs e)
+        {
+            if (sender is not Button btn) return;
+            switch (btn.Tag as string)
+            {
+                case "User": OpenUser(); return;
+                case "MenuTypes": OpenMenuTypes(); return;
+                case "Category": OpenCategory(); return;
+                case "Menu": OpenMenu(); return;
+                case "CouponAndPromo": OpenCouponAndPromo(); return;
+            }
+        }
 
+        void OpenUser()
+        {
+            var userWindow = new AppUsersWindow();
+            //userWindow.DataContext = new AppUsersViewModel(_data, this);
+            userWindow.ShowDialog(this);
+        }
+        void OpenMenuTypes()
+        {
+            var menuTypesWindow = new DrinkAndAddOnTypeWindow();
+            menuTypesWindow.ShowDialog(this);
+        }
+        void OpenCategory()
+        {
+            var categoryWindow = new CategoryWindow();
+            categoryWindow.ShowDialog(this);
+        }
+        void OpenMenu()
+        {
+            var menuWindow = new MenuWindow();
+            menuWindow.ShowDialog(this);
+        }
+        void OpenCouponAndPromo()
+        {
+            var couponPromoWindow = new CouponPromoWindow();
+            couponPromoWindow.ShowDialog(this);
+        }
     }
 }

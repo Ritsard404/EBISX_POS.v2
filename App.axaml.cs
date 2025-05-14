@@ -93,17 +93,16 @@ namespace EBISX_POS
                 {
                     DisableAvaloniaDataAnnotationValidation();
 
-                    //CashierState.OnCashierStateChanged += () =>
-                    //{
-                    //    desktop.MainWindow = !string.IsNullOrEmpty(CashierState.CashierName)
-                    //        ? Services.GetRequiredService<MainWindow>()
-                    //        : Services.GetRequiredService<LogInWindow>();
-                    //};
+                    CashierState.OnCashierStateChanged += () =>
+                    {
+                        desktop.MainWindow = !string.IsNullOrEmpty(CashierState.CashierName)
+                            ? Services.GetRequiredService<MainWindow>()
+                            : Services.GetRequiredService<LogInWindow>();
+                    };
 
-                    //desktop.MainWindow = !string.IsNullOrEmpty(CashierState.CashierName)
-                    //    ? Services.GetRequiredService<MainWindow>()
-                    //    : Services.GetRequiredService<LogInWindow>();
-                    desktop.MainWindow = Services.GetRequiredService<CouponPromoWindow>();
+                    desktop.MainWindow = !string.IsNullOrEmpty(CashierState.CashierName)
+                        ? Services.GetRequiredService<MainWindow>()
+                        : Services.GetRequiredService<LogInWindow>();
                 }
             }
             catch (Exception ex)
