@@ -22,6 +22,8 @@
                  Watermark="Manager Email"
                  UseFloatingWatermark="True"
 					 Height="40"
+					 PasswordChar="*"
+					 RevealPassword="False"
 				 Margin="0,0,0, 40"/>
 
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
