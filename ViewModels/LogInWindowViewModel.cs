@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
+using EBISX_POS.API.Services.Interfaces;
 
 namespace EBISX_POS.ViewModels
 {
@@ -23,6 +24,7 @@ namespace EBISX_POS.ViewModels
     {
         private readonly MenuService _menuService;
         private readonly AuthService _authService;
+        private readonly IEbisxAPI _ebisxAPI;
 
         [ObservableProperty]
         private bool isLoading;
@@ -49,16 +51,16 @@ namespace EBISX_POS.ViewModels
         [ObservableProperty]
         private bool hasTrainMode = false;
 
-
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
         public ObservableCollection<CashierDTO> Cashiers { get; } = new();
 
-        public LogInWindowViewModel(AuthService authService, MenuService menuService)
+        public LogInWindowViewModel(AuthService authService, MenuService menuService, IEbisxAPI ebisxAPI)
         {
             _authService = authService;
             _menuService = menuService;
-            
+            _ebisxAPI = ebisxAPI;
+
             InitializeAsync();
         }
         public async void InitializeAsync()
@@ -67,7 +69,7 @@ namespace EBISX_POS.ViewModels
             {
                 // Wait for database initialization to complete
                 await Task.Delay(1000); // Give time for database initialization
-                
+
                 await CheckData(); // this might navigate and close
                 await CheckMode();
                 await LoadCashiersAsync();
@@ -124,7 +126,7 @@ namespace EBISX_POS.ViewModels
                             var managerWindow = new ManagerWindow();
                             desktop.MainWindow = managerWindow;
                             managerWindow.Show();
-                            
+
                             // Close the LoginWindow
                             if (desktop.Windows.FirstOrDefault(w => w is LogInWindow) is LogInWindow loginWindow)
                             {
@@ -177,7 +179,7 @@ namespace EBISX_POS.ViewModels
             {
 
                 IsLoading = true;
-                var (success, cashierEmail, cashierName ) = await _authService.HasPendingOrder();
+                var (success, cashierEmail, cashierName) = await _authService.HasPendingOrder();
                 if (success)
                 {
                     if (_hasNavigated) return;
@@ -241,8 +243,8 @@ namespace EBISX_POS.ViewModels
                 {
                     ErrorMessage = result.name;
                     OnPropertyChanged(nameof(HasError));
-                    IsLoading = false; 
-                    
+                    IsLoading = false;
+
                     var alertBox = MessageBoxManager.GetMessageBoxStandard(
                         new MessageBoxStandardParams
                         {
@@ -277,8 +279,50 @@ namespace EBISX_POS.ViewModels
                     return;
                 }
 
+                var (isValid, message, canProcessTransactions) = await _ebisxAPI.ValidateTerminalForTransaction();
+
+                if (!canProcessTransactions)
+                {
+                    var alertBox = MessageBoxManager.GetMessageBoxStandard(
+                        new MessageBoxStandardParams
+                        {
+                            ContentHeader = "Terminal Validation Error",
+                            ContentMessage = message,
+                            ButtonDefinitions = ButtonEnum.Ok,
+                            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                            CanResize = false,
+                            SizeToContent = SizeToContent.WidthAndHeight,
+                            Width = 400,
+                            ShowInCenter = true,
+                            SystemDecorations = SystemDecorations.None,
+                            Icon = Icon.Error,
+                        });
+
+                    await alertBox.ShowAsPopupAsync(owner);
+                    return;
+                }
+
+                if (!isValid)
+                {
+                    var warningBox = MessageBoxManager.GetMessageBoxStandard(
+                        new MessageBoxStandardParams
+                        {
+                            ContentHeader = "Terminal Warning",
+                            ContentMessage = message,
+                            ButtonDefinitions = ButtonEnum.Ok,
+                            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                            CanResize = false,
+                            SizeToContent = SizeToContent.WidthAndHeight,
+                            Width = 400,
+                            ShowInCenter = true,
+                            SystemDecorations = SystemDecorations.None,
+                            Icon = Icon.Warning,
+                        });
+
+                    await warningBox.ShowAsPopupAsync(owner);
+                }
+
                 NavigateToMainWindow(cashierEmail: result.email, cashierName: result.name, owner);
-                //owner.Close();
             }
             catch (Exception ex)
             {
@@ -292,6 +336,7 @@ namespace EBISX_POS.ViewModels
                 IsLoading = false;
             }
         }
+
         private Window? GetCurrentWindow()
         {
             if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
@@ -305,6 +350,7 @@ namespace EBISX_POS.ViewModels
         {
             CashierState.CashierEmail = cashierEmail;
             CashierState.CashierName = cashierName;
+            CashierState.ManagerEmail = ManagerEmail;
 
             var mainWindow = new MainWindow(_menuService, _authService)
             {

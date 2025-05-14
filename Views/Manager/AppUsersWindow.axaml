@@ -60,13 +60,13 @@
                         <DataGridTemplateColumn Width="*" Header="Role">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding UserRole}" 
+                                    <TextBlock Margin="10,0,0,0" Text="{Binding UserRole}" 
                                              VerticalAlignment="Center"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
                                 <DataTemplate>
-									<ComboBox
+									<ComboBox  Margin="10,0,0,0"
 										Loaded="OnRoleComboLoaded"
 										SelectedValue="{Binding UserRole, Mode=TwoWay}"
                                             MaxDropDownHeight="100">
@@ -77,13 +77,13 @@
                         <DataGridTemplateColumn Width="*" Header="Status">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}"
+                                    <TextBlock  Margin="10,0,0,0" Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}"
                                              VerticalAlignment="Center"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
                                 <DataTemplate>
-                                    <ComboBox
+                                    <ComboBox  Margin="10,0,0,0"
 										Loaded="OnStatusComboLoaded"
 										SelectedValue="{Binding Status, Mode=TwoWay}"
                                             MaxDropDownHeight="100">

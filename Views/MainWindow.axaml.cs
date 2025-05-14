@@ -401,7 +401,6 @@ namespace EBISX_POS.Views
 
             if (success)
             {
-                string managerEmail = "user1@example.com";
                 var otherDiscount = new OtherDiscountWindow(email);
                 await otherDiscount.ShowDialog((Window)this.VisualRoot);
 

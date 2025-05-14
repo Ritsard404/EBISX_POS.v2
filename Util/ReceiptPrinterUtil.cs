@@ -79,7 +79,7 @@ namespace EBISX_POS.Util
             writer.WriteLine();
 
             // Cashier & OR
-            writer.WriteLine(AlignText("Cashier:", rpt.Cashier));
+            writer.WriteLine(AlignText($"Cashier: {rpt.Cashier}",""));
             writer.WriteLine();
             writer.WriteLine(AlignText("Beg. OR #:", rpt.BeginningOrNumber));
             writer.WriteLine(AlignText("End. OR #:", rpt.EndingOrNumber));

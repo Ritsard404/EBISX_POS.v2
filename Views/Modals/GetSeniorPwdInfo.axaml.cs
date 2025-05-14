@@ -166,7 +166,7 @@ namespace EBISX_POS.Views
             await orderService.AddPwdScDiscount(new AddPwdScDiscountDTO()
             {
                 EntryId = _selectedIDs,
-                ManagerEmail = "user1@example.com",
+                ManagerEmail = CashierState.ManagerEmail??"",
                 PwdScCount = _inputCount,
                 IsSeniorDisc = !_isPwdSelected,
                 EligiblePwdScNames = namesCombined,
