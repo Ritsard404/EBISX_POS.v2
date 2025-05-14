@@ -356,6 +356,7 @@ namespace EBISX_POS.Views
             var (success, email) = await swipeManager.ShowDialogAsync(this);          
             if (success)
             {
+                CashierState.ManagerEmail = email;
                 var discountPwdSw = new SelectDiscountPwdScWindow();
                 await discountPwdSw.ShowDialog((Window)this.VisualRoot);
 

@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia;
 using Avalonia.Interactivity;
-using EBISX_POS.API.Services.Interfaces;
 using EBISX_POS.v2.Views;
 
 namespace EBISX_POS.Views
@@ -354,8 +353,8 @@ namespace EBISX_POS.Views
                     desktop.MainWindow = logInWindow;
                 }
                 logInWindow.Show();
-                ShowLoader(false);
                 Close();
+                ShowLoader(false);
             }
             return;
             //case ButtonResult.Cancel:

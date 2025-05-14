@@ -24,7 +24,6 @@ namespace EBISX_POS.ViewModels
     {
         private readonly MenuService _menuService;
         private readonly AuthService _authService;
-        private readonly IEbisxAPI _ebisxAPI;
 
         [ObservableProperty]
         private bool isLoading;
@@ -51,16 +50,16 @@ namespace EBISX_POS.ViewModels
         [ObservableProperty]
         private bool hasTrainMode = false;
 
+
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
         public ObservableCollection<CashierDTO> Cashiers { get; } = new();
 
-        public LogInWindowViewModel(AuthService authService, MenuService menuService, IEbisxAPI ebisxAPI)
+        public LogInWindowViewModel(AuthService authService, MenuService menuService)
         {
             _authService = authService;
             _menuService = menuService;
-            _ebisxAPI = ebisxAPI;
-
+            
             InitializeAsync();
         }
         public async void InitializeAsync()
@@ -69,7 +68,57 @@ namespace EBISX_POS.ViewModels
             {
                 // Wait for database initialization to complete
                 await Task.Delay(1000); // Give time for database initialization
+                
+                var ebisxService = App.Current.Services.GetRequiredService<IEbisxAPI>();
+                
+                // Validate terminal first
+                var (isValid, message) = await ebisxService.ValidateTerminalExpiration();
+                if (!isValid)
+                {
+                    var owner = GetCurrentWindow();
+                    var alertBox = MessageBoxManager.GetMessageBoxStandard(
+                        new MessageBoxStandardParams
+                        {
+                            ContentHeader = "Terminal Validation Error",
+                            ContentMessage = message,
+                            ButtonDefinitions = ButtonEnum.Ok,
+                            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                            CanResize = false,
+                            SizeToContent = SizeToContent.WidthAndHeight,
+                            Width = 400,
+                            ShowInCenter = true,
+                            SystemDecorations = SystemDecorations.None,
+                            Icon = Icon.Error,
+                        });
 
+                    await alertBox.ShowAsPopupAsync(owner);
+                    return;
+                }
+
+                // Check if terminal is expiring soon
+                var isExpiringSoon = await ebisxService.IsTerminalExpiringSoon();
+                if (isExpiringSoon)
+                {
+                    var remainingDays = await ebisxService.GetRemainingDays();
+                    var owner = GetCurrentWindow();
+                    var alertBox = MessageBoxManager.GetMessageBoxStandard(
+                        new MessageBoxStandardParams
+                        {
+                            ContentHeader = "Terminal Expiration Warning",
+                            ContentMessage = $"Warning: POS terminal will expire in {remainingDays} days. Please contact your administrator.",
+                            ButtonDefinitions = ButtonEnum.Ok,
+                            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                            CanResize = false,
+                            SizeToContent = SizeToContent.WidthAndHeight,
+                            Width = 400,
+                            ShowInCenter = true,
+                            SystemDecorations = SystemDecorations.None,
+                            Icon = Icon.Warning,
+                        });
+
+                    await alertBox.ShowAsPopupAsync(owner);
+                }
+                
                 await CheckData(); // this might navigate and close
                 await CheckMode();
                 await LoadCashiersAsync();
@@ -126,7 +175,7 @@ namespace EBISX_POS.ViewModels
                             var managerWindow = new ManagerWindow();
                             desktop.MainWindow = managerWindow;
                             managerWindow.Show();
-
+                            
                             // Close the LoginWindow
                             if (desktop.Windows.FirstOrDefault(w => w is LogInWindow) is LogInWindow loginWindow)
                             {
@@ -179,7 +228,7 @@ namespace EBISX_POS.ViewModels
             {
 
                 IsLoading = true;
-                var (success, cashierEmail, cashierName) = await _authService.HasPendingOrder();
+                var (success, cashierEmail, cashierName ) = await _authService.HasPendingOrder();
                 if (success)
                 {
                     if (_hasNavigated) return;
@@ -223,6 +272,7 @@ namespace EBISX_POS.ViewModels
         [RelayCommand]
         private async Task LogInAsync()
         {
+            var ebisxService = App.Current.Services.GetRequiredService<IEbisxAPI>();
             try
             {
                 CashierState.CashierStateReset();
@@ -243,8 +293,8 @@ namespace EBISX_POS.ViewModels
                 {
                     ErrorMessage = result.name;
                     OnPropertyChanged(nameof(HasError));
-                    IsLoading = false;
-
+                    IsLoading = false; 
+                    
                     var alertBox = MessageBoxManager.GetMessageBoxStandard(
                         new MessageBoxStandardParams
                         {
@@ -279,9 +329,9 @@ namespace EBISX_POS.ViewModels
                     return;
                 }
 
-                var (isValid, message, canProcessTransactions) = await _ebisxAPI.ValidateTerminalForTransaction();
-
-                if (!canProcessTransactions)
+                // Validate terminal for non-manager logins
+                var (isValid, message) = await ebisxService.ValidateTerminalExpiration();
+                if (!isValid)
                 {
                     var alertBox = MessageBoxManager.GetMessageBoxStandard(
                         new MessageBoxStandardParams
@@ -302,13 +352,16 @@ namespace EBISX_POS.ViewModels
                     return;
                 }
 
-                if (!isValid)
+                // Check if terminal is expiring soon
+                var isExpiringSoon = await ebisxService.IsTerminalExpiringSoon();
+                if (isExpiringSoon)
                 {
-                    var warningBox = MessageBoxManager.GetMessageBoxStandard(
+                    var remainingDays = await ebisxService.GetRemainingDays();
+                    var alertBox = MessageBoxManager.GetMessageBoxStandard(
                         new MessageBoxStandardParams
                         {
-                            ContentHeader = "Terminal Warning",
-                            ContentMessage = message,
+                            ContentHeader = "Terminal Expiration Warning",
+                            ContentMessage = $"Warning: POS terminal will expire in {remainingDays} days. Please contact your administrator.",
                             ButtonDefinitions = ButtonEnum.Ok,
                             WindowStartupLocation = WindowStartupLocation.CenterOwner,
                             CanResize = false,
@@ -319,7 +372,7 @@ namespace EBISX_POS.ViewModels
                             Icon = Icon.Warning,
                         });
 
-                    await warningBox.ShowAsPopupAsync(owner);
+                    await alertBox.ShowAsPopupAsync(owner);
                 }
 
                 NavigateToMainWindow(cashierEmail: result.email, cashierName: result.name, owner);
@@ -336,7 +389,6 @@ namespace EBISX_POS.ViewModels
                 IsLoading = false;
             }
         }
-
         private Window? GetCurrentWindow()
         {
             if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
@@ -350,7 +402,6 @@ namespace EBISX_POS.ViewModels
         {
             CashierState.CashierEmail = cashierEmail;
             CashierState.CashierName = cashierName;
-            CashierState.ManagerEmail = ManagerEmail;
 
             var mainWindow = new MainWindow(_menuService, _authService)
             {

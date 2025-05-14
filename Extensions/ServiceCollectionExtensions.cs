@@ -96,10 +96,10 @@ namespace EBISX_POS.API.Extensions
             services.AddScoped<IOrder, OrderRepository>();
             services.AddScoped<IPayment, PaymentRepository>();
             services.AddScoped<IJournal, JournalRepository>();
-            services.AddScoped<IEbisxAPI, EbisxAPIRepository>();
             services.AddScoped<IReport, ReportRepository>();
             services.AddScoped<IInvoiceNumberService, InvoiceNumberService>();
             services.AddScoped<IData, DataRepository>();
+            services.AddScoped<IEbisxAPI, EbisxAPIRepository>();
 
             return services;
         }

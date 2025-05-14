@@ -155,10 +155,6 @@ namespace EBISX_POS.Views
             string namesCombined = string.Join(", ", names);
             string oscaCombined = string.Join(", ", oscaNumbers);
 
-            // For demonstration, output to console (or process as needed)
-            Debug.WriteLine("Names: " + namesCombined);
-            Debug.WriteLine("Osca Numbers: " + oscaCombined);
-
 
             var orderService = App.Current.Services.GetRequiredService<OrderService>();
 
@@ -232,7 +228,7 @@ namespace EBISX_POS.Views
 
             // Refresh UI display (if needed by your application).
             OrderState.CurrentOrderItem.RefreshDisplaySubOrders();
-
+            CashierState.ManagerEmail = null;
             Close();
             Submit_Button.IsEnabled = true;
 
