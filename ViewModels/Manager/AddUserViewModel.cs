@@ -6,6 +6,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Diagnostics;
 using Avalonia.Controls;
+using System.Collections.ObjectModel;
+using MsBox.Avalonia.Dto;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
+using Tmds.DBus.Protocol;
 
 namespace EBISX_POS.ViewModels.Manager
 {
@@ -28,6 +33,8 @@ namespace EBISX_POS.ViewModels.Manager
 
         [ObservableProperty]
         private string? _errorMessage;
+        public ObservableCollection<string> AvailableRoles { get; } =
+    new ObservableCollection<string> { "Manager", "Cashier" };
 
         public AddUserViewModel(IData dataService, Window window)
         {
@@ -39,12 +46,12 @@ namespace EBISX_POS.ViewModels.Manager
         private async Task AddUser()
         {
             Debug.WriteLine("→ AddUser started");
-            if (string.IsNullOrWhiteSpace(Email) || 
-                string.IsNullOrWhiteSpace(FirstName) || 
-                string.IsNullOrWhiteSpace(LastName) || 
+            if (string.IsNullOrWhiteSpace(Email) ||
+                string.IsNullOrWhiteSpace(FirstName) ||
+                string.IsNullOrWhiteSpace(LastName) ||
                 string.IsNullOrWhiteSpace(Role))
             {
-                ErrorMessage = "All fields are required";
+                ShowError("All fields are required");
                 return;
             }
 
@@ -59,19 +66,19 @@ namespace EBISX_POS.ViewModels.Manager
                 };
 
                 var (isSuccess, message, _) = await _dataService.AddUser(newUser, CashierState.ManagerEmail!);
-                
+
                 if (isSuccess)
                 {
                     _window.Close();
                 }
                 else
                 {
-                    ErrorMessage = message;
+                    ShowError(message);
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to add user: {ex.Message}";
+                ShowError($"Failed to add user: {ex.Message}");
                 Debug.WriteLine($"❌ AddUser exception: {ex}");
             }
         }
@@ -81,5 +88,20 @@ namespace EBISX_POS.ViewModels.Manager
         {
             _window.Close();
         }
+
+        private void ShowError(string message)
+        {
+            var msgBox = MessageBoxManager
+                .GetMessageBoxStandard(new MessageBoxStandardParams
+                {
+                    ButtonDefinitions = ButtonEnum.Ok,
+                    ContentTitle = "Error",
+                    ContentMessage = message,
+                    Icon = Icon.Error
+                });
+
+            msgBox.ShowAsPopupAsync(_window);
+        }
+
     }
-} 
+}

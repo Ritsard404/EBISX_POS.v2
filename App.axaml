@@ -33,5 +33,6 @@
 		<converters:StringToBoolConverter x:Key="StringToBoolConverter"/>
 		<converters:NullToOpacityConverter x:Key="NullToOpacityConverter"/>
 		<converters:BoolToTextConverter x:Key="BoolToTextConverter"/>
+		<converters:StatusMessageColorConverter x:Key="StatusMessageColorConverter"/>
 	</Application.Resources>
 </Application>

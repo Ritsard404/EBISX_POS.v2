@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using EBISX_POS.ViewModels.Manager;
+using EBISX_POS.v2.Views;
 
 namespace EBISX_POS
 {
@@ -103,6 +104,7 @@ namespace EBISX_POS
                     desktop.MainWindow = !string.IsNullOrEmpty(CashierState.CashierName)
                         ? Services.GetRequiredService<MainWindow>()
                         : Services.GetRequiredService<LogInWindow>();
+                    //desktop.MainWindow  = Services.GetRequiredService<PosTerminalInfoView>();
                 }
             }
             catch (Exception ex)
@@ -199,6 +201,7 @@ namespace EBISX_POS
             services.AddTransient<DrinkAndAddOnTypeWindow>();
             services.AddTransient<MenuWindow>();
             services.AddTransient<CouponPromoWindow>();
+            services.AddTransient<PosTerminalInfoView>();
 
             return services.BuildServiceProvider();
         }

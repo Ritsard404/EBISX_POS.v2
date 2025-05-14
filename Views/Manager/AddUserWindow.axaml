@@ -2,13 +2,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
         x:Class="EBISX_POS.AddUserWindow"
         xmlns:vm="using:EBISX_POS.ViewModels.Manager"
         x:DataType="vm:AddUserViewModel"
         Title="Add New User"
         WindowStartupLocation="CenterOwner"
-        Width="400" Height="450"
+        Width="400" Height="300"
         SystemDecorations="None"
         CornerRadius="10">
     <Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
@@ -26,11 +26,8 @@
                          Text="{Binding FirstName, Mode=TwoWay}"/>
                 <TextBox Watermark="Last Name"
                          Text="{Binding LastName, Mode=TwoWay}"/>
-                <ComboBox PlaceholderText="Role" SelectedValue="{Binding Role, Mode=TwoWay}"
-                         >
-                    <ComboBoxItem Content="Manager"/>
-                    <ComboBoxItem Content="Cashier"/>
-                </ComboBox>
+				<ComboBox PlaceholderText="Role" ItemsSource="{Binding AvailableRoles}" SelectedValue="{Binding Role, Mode=TwoWay}"
+                         />
             </StackPanel>
 
             <StackPanel Grid.Row="2" 
@@ -46,19 +43,6 @@
                         Padding="20,5"/>
             </StackPanel>
 
-            <!-- Error Message -->
-            <Border Grid.Row="1"
-                    Background="#FFE0E0" 
-                    BorderBrush="Red" 
-                    BorderThickness="1" 
-                    CornerRadius="5"
-                    Padding="10"
-                    VerticalAlignment="Top"
-                    IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}">
-                <TextBlock Text="{Binding ErrorMessage}"
-                         Foreground="Red"
-                         TextWrapping="Wrap"/>
-            </Border>
         </Grid>
     </Border>
 </Window> 
