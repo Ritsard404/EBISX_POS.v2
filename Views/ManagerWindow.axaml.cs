@@ -322,7 +322,7 @@ namespace EBISX_POS.Views
                     return;
 
                 // 3. Cash‑out step
-                var cashOutWindow = new SetCashDrawerWindow("Cash‑Out");
+                var cashOutWindow = new SetCashDrawerWindow("Cash-Out");
                 bool drawerOk = await cashOutWindow.ShowDialog<bool>(this);
 
                 if (!drawerOk)

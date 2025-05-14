@@ -11,6 +11,7 @@ using Avalonia.Threading;
 using System;
 using Microsoft.AspNetCore.Http.HttpResults;
 using MsBox.Avalonia.Dto;
+using System.Diagnostics;
 
 namespace EBISX_POS.Views
 {
@@ -165,6 +166,8 @@ namespace EBISX_POS.Views
             }
 
             StartButton.IsEnabled = false;
+
+            Debug.WriteLine($"[SetCashDrawer] _cashDrawer = '{_cashDrawer}'");
 
             var (success, msg) = _cashDrawer switch
             {
