@@ -155,9 +155,7 @@ namespace EBISX_POS.Views
             string namesCombined = string.Join(", ", names);
             string oscaCombined = string.Join(", ", oscaNumbers);
 
-
             var orderService = App.Current.Services.GetRequiredService<OrderService>();
-
 
             await orderService.AddPwdScDiscount(new AddPwdScDiscountDTO()
             {

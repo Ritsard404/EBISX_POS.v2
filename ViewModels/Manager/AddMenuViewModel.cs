@@ -41,10 +41,10 @@ namespace EBISX_POS.ViewModels.Manager
         private List<string> _drinkSizes = new List<string>
         {
             "",
-            "Small",
-            "Medium",
-            "Large",
-            "Extra Large"
+            "S",
+            "M",
+            "L",
+            "XL"
         };
 
         [ObservableProperty]
