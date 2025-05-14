@@ -42,7 +42,7 @@ namespace EBISX_POS.Views
                     DataContext = new OrderItemEditWindowViewModel(SelectedCurrentOrderItem)
                 };
 
-                if (SelectedCurrentOrderItem.CouponCode != null || SelectedCurrentOrderItem.SubOrders.Any(s => s.IsOtherDisc))
+                if (SelectedCurrentOrderItem.CouponCode != null || SelectedCurrentOrderItem.SubOrders.Any(s => s.IsOtherDisc) || SelectedCurrentOrderItem.HasDiscount)
                     return;
 
                 await detailsWindow.ShowDialog((Window)this.VisualRoot);
