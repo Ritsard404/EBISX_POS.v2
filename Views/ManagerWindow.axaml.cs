@@ -31,7 +31,6 @@ namespace EBISX_POS.Views
         private readonly IServiceProvider? _serviceProvider;
         private readonly MenuService _menuService;
         private readonly AuthService _authService;
-        private readonly IData _data;
 
         // Constructor with IServiceProvider parameter
         public ManagerWindow(IServiceProvider serviceProvider)
@@ -47,7 +46,6 @@ namespace EBISX_POS.Views
             _cashTrackReportPath = serviceProvider
                                         .GetRequiredService<IOptions<SalesReport>>()
                                         .Value.CashTrackReport;
-            _data = serviceProvider.GetRequiredService<IData>();
 
             // cache these checks so you only call them once
             bool hasManager = !string.IsNullOrWhiteSpace(CashierState.ManagerEmail);
@@ -405,7 +403,6 @@ namespace EBISX_POS.Views
         void OpenUser()
         {
             var userWindow = new AppUsersWindow();
-            //userWindow.DataContext = new AppUsersViewModel(_data, this);
             userWindow.ShowDialog(this);
         }
         void OpenMenuTypes()

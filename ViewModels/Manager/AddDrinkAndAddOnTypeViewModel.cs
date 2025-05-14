@@ -72,7 +72,7 @@ namespace EBISX_POS.ViewModels.Manager
 
                     var (isSuccess, message, _) = await _menuService.AddDrinkType(
                         new DrinkType { DrinkTypeName = DrinkTypeName },
-                        "EBISX@POS.com");
+                        CashierState.ManagerEmail!);
 
                     await ShowMessage(isSuccess ? "Success" : "Error", message,
                         isSuccess ? Icon.Success : Icon.Error);
@@ -90,7 +90,7 @@ namespace EBISX_POS.ViewModels.Manager
 
                     var (isSuccess, message, _) = await _menuService.AddAddOnType(
                         new AddOnType { AddOnTypeName = AddOnTypeName },
-                        "EBISX@POS.com");
+                        CashierState.ManagerEmail!);
 
                     await ShowMessage(isSuccess ? "Success" : "Error", message,
                         isSuccess ? Icon.Success : Icon.Error);

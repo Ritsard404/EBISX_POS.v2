@@ -92,7 +92,7 @@ namespace EBISX_POS.ViewModels.Manager
                 var result = await box.ShowAsPopupAsync(_window);
                 if(result == ButtonResult.Ok)
                 {
-                    var (isSuccess, message) = await _menuService.DeleteMenu(menu.Id, "EBISX@POS.com");
+                    var (isSuccess, message) = await _menuService.DeleteMenu(menu.Id, CashierState.ManagerEmail!);
 
                     if (isSuccess)
                     {

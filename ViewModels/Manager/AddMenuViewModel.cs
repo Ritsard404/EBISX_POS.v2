@@ -23,7 +23,6 @@ namespace EBISX_POS.ViewModels.Manager
         // Dependencies
         private readonly IMenu _menuService;
         private readonly Window _window;
-        private const string DEFAULT_USER = "EBISX@POS.com";
 
         // Observable properties for UI binding
         [ObservableProperty]
@@ -272,8 +271,8 @@ namespace EBISX_POS.ViewModels.Manager
                 };
 
                 var (isSuccess, message) = IsEditMode
-                    ? await _menuService.UpdateMenu(menuToSave, DEFAULT_USER)
-                    : await _menuService.AddMenu(menuToSave, DEFAULT_USER);
+                    ? await _menuService.UpdateMenu(menuToSave, CashierState.ManagerEmail!)
+                    : await _menuService.AddMenu(menuToSave, CashierState.ManagerEmail!);
 
                 if (isSuccess)
                 {

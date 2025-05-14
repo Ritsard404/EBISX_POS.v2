@@ -20,7 +20,6 @@ namespace EBISX_POS.ViewModels.Manager
     {
         private readonly IMenu _menuService;
         private readonly Window _window;
-        private const string DEFAULT_USER = "EBISX@POS.com";
 
         [ObservableProperty]
         private ObservableCollection<AddOnType> _addOnTypes = new();
@@ -104,7 +103,7 @@ namespace EBISX_POS.ViewModels.Manager
 
             try
             {
-                var (isSuccess, message) = await updateAction(type, DEFAULT_USER);
+                var (isSuccess, message) = await updateAction(type, CashierState.ManagerEmail!);
 
                 if (isSuccess)
                 {
@@ -138,7 +137,7 @@ namespace EBISX_POS.ViewModels.Manager
                     _ => throw new ArgumentException("Unsupported type")
                 };
 
-                var (isSuccess, message) = await deleteAction(id, DEFAULT_USER);
+                var (isSuccess, message) = await deleteAction(id, CashierState.ManagerEmail!);
 
                 if (isSuccess)
                 {

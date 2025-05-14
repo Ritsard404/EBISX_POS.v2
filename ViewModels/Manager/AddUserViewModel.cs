@@ -58,7 +58,7 @@ namespace EBISX_POS.ViewModels.Manager
                     UserRole = Role,
                 };
 
-                var (isSuccess, message, _) = await _dataService.AddUser(newUser, "user@example.com");
+                var (isSuccess, message, _) = await _dataService.AddUser(newUser, CashierState.ManagerEmail!);
                 
                 if (isSuccess)
                 {

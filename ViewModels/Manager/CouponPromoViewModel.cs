@@ -87,7 +87,7 @@ namespace EBISX_POS.ViewModels.Manager
                 var result = await box.ShowAsPopupAsync(_window);
                 if (result == ButtonResult.Ok)
                 {
-                    var (isSuccess, message) = await _menuService.DeleteCouponPromo(couponPromo.Id, "EBISX@POS.com");
+                    var (isSuccess, message) = await _menuService.DeleteCouponPromo(couponPromo.Id, CashierState.ManagerEmail!);
 
                     if (isSuccess)
                     {

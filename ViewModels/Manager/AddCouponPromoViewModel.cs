@@ -155,7 +155,7 @@ namespace EBISX_POS.ViewModels.Manager
                 if (_isEditMode && _existingCouponPromo != null)
                 {
                     couponPromo.Id = _existingCouponPromo.Id;
-                    var (isSuccess, message) = await _menuService.UpdateCouponPromo(couponPromo, "EBISX@POS.com");
+                    var (isSuccess, message) = await _menuService.UpdateCouponPromo(couponPromo, CashierState.ManagerEmail!);
                     if (isSuccess)
                     {
                         await ShowSuccess(message);
@@ -166,7 +166,7 @@ namespace EBISX_POS.ViewModels.Manager
                 }
                 else
                 {
-                    var (isSuccess, message, _) = await _menuService.AddCouponPromo(couponPromo, "EBISX@POS.com");
+                    var (isSuccess, message, _) = await _menuService.AddCouponPromo(couponPromo, CashierState.ManagerEmail!);
                     if (isSuccess)
                     {
                         await ShowSuccess(message);

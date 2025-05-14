@@ -42,7 +42,8 @@
                          Watermark="Enter manager email"
                          FontFamily="{StaticResource NunitoFont}"
                          FontSize="16"
-                         Margin="0,0,0,5"/>
+                         Margin="0,0,0,5"
+						 RevealPassword="False"/>
                 <TextBlock x:Name="ValidationTextBlock"
                           Foreground="Red"
                           FontSize="14"

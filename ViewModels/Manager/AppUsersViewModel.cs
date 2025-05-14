@@ -91,7 +91,7 @@ namespace EBISX_POS.ViewModels.Manager
 
             try
             {
-                var (isSuccess, message) = await _dataService.UpdateUser(user, "user@example.com");
+                var (isSuccess, message) = await _dataService.UpdateUser(user, CashierState.ManagerEmail!);
 
                 if (isSuccess)
                 {

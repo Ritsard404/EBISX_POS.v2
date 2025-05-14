@@ -199,7 +199,7 @@ namespace EBISX_POS.Services
                             UserEmail = "EBISX@POS.com",
                             UserFName = "Ebisx",
                             UserLName = "Pos",
-                            UserRole = "Manager"
+                            UserRole = "Developer"
                         };
 
                         await _dataContext.User.AddAsync(users, cts.Token);
