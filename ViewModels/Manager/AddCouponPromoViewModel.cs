@@ -219,6 +219,12 @@ namespace EBISX_POS.ViewModels.Manager
                 return false;
             }
 
+            if (!string.IsNullOrWhiteSpace(PromoCode) && !string.IsNullOrWhiteSpace(CouponCode))
+            {
+                ShowError("Please provide either a Promo Code or a Coupon Code, but not both.");
+                return false;
+            }
+
             if (!string.IsNullOrWhiteSpace(CouponCode) && SelectedMenus.Count == 0)
             {
                 ShowError("At least one menu item must be selected for a coupon.");
