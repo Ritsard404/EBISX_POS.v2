@@ -189,19 +189,19 @@ namespace EBISX_POS.ViewModels.Manager
                 Debug.WriteLine($"Error opening drink type window: {ex}");
             }
         }
-        public async Task RemoveAddOnType()
+        public async Task RemoveAddOnType(AddOnType addOn)
         {
-            if (SelectedAddOnType != null)
+            if (addOn != null)
             {
-                await DeleteType(SelectedAddOnType, _menuService.DeleteAddOnType);
+                await DeleteType(addOn, _menuService.DeleteAddOnType);
             }
         }
 
-        public async Task RemoveDrinkType()
+        public async Task RemoveDrinkType(DrinkType drinkType)
         {
-            if (SelectedDrinkType != null)
+            if (drinkType != null)
             {
-                await DeleteType(SelectedDrinkType, _menuService.DeleteDrinkType);
+                await DeleteType(drinkType, _menuService.DeleteDrinkType);
             }
         }
 

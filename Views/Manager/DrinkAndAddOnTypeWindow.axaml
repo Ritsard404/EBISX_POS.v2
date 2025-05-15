@@ -51,6 +51,7 @@
 										<Button
 											HorizontalAlignment="Center"
 											Content="Remove"
+											Tag="{Binding}"
 											Background="Red"
 											Click="RemoveAddOnTypeButton_Click"/>
 									</DataTemplate>
@@ -116,6 +117,7 @@
 										<Button
 											HorizontalAlignment="Center"
 											Content="Remove"
+											Tag="{Binding}"
 											Background="Red"
 											Click="RemoveDrinkTypeButton_Click"/>
 									</DataTemplate>

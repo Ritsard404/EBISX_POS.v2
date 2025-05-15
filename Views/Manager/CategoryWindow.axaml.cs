@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using EBISX_POS.API.Models;
 using EBISX_POS.API.Services.Interfaces;
 using EBISX_POS.ViewModels.Manager;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,9 @@ public partial class CategoryWindow : Window
 
     private async void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        await ViewModel.RemoveCategory();
+        if (sender is Button button && button.Tag is Category category)
+        {
+            await ViewModel.RemoveCategory(category);
+        }
     }
 }

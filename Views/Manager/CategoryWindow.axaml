@@ -61,6 +61,7 @@
 										HorizontalAlignment="Center"
 										Content="Remove"
 										Background="Red"
+										Tag="{Binding}"
 										Click="Button_Click"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>

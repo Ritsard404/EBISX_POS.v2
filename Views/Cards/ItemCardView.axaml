@@ -37,7 +37,7 @@
                     IsVisible="{Binding IsSolo}">
 				<TextBlock Text="Solo"
                            FontWeight="Bold"
-                           FontSize="14"
+                           FontSize="12"
                            Foreground="BlueViolet"/>
 			</Border>
 

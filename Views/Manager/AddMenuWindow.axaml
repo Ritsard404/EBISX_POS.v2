@@ -19,7 +19,7 @@
                       Text="{Binding WindowTitle}"
                       FontSize="20"
                       FontWeight="Bold"
-                      Margin="0,0,0,20"/>
+                      Margin="0,0,0,5"/>
 
 			<StackPanel
 				Grid.Row="1"
@@ -27,7 +27,7 @@
 				Spacing="15"
 				HorizontalAlignment="Center"
 				VerticalAlignment="Center"
-				Margin="0,20">
+				Margin="0,10,0,0">
 
 				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" VerticalAlignment="Center">
 					<Grid>
@@ -67,6 +67,15 @@
 				</StackPanel>
 				
 				<!-- Row 1: Name & Price -->
+				<StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding IsEditMode}">
+					<ToggleButton
+					  Width="130"
+					  Content="Available"
+					  HorizontalContentAlignment="Center"
+					  IsChecked="{Binding MenuDetails.MenuIsAvailable}"/>
+				</StackPanel>
+				
+				<!-- Row 1: Name & Price -->
 				<StackPanel Orientation="Horizontal" Spacing="10">
 					<TextBox
 					  Width="200"
@@ -102,14 +111,14 @@
 					  ItemsSource="{Binding AddOns}"
 					  DisplayMemberBinding="{Binding AddOnTypeName}"
 					  SelectedItem="{Binding MenuDetails.AddOnType}"
-					  PlaceholderText="Select Add-On"
+					  PlaceholderText="Select Add-On Type"
 					  MaxDropDownHeight="100"/>
 					<ComboBox
 					  Width="200"
 					  ItemsSource="{Binding Drinks}"
 					  DisplayMemberBinding="{Binding DrinkTypeName}"
 					  SelectedItem="{Binding MenuDetails.DrinkType}"
-					  PlaceholderText="Select Drink"
+					  PlaceholderText="Select Drink Type"
 					  MaxDropDownHeight="100"/>
 				</StackPanel>
 

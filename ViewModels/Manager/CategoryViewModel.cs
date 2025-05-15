@@ -100,13 +100,13 @@ namespace EBISX_POS.ViewModels.Manager
             }
         }
 
-        public async Task RemoveCategory()
+        public async Task RemoveCategory(Category category)
         {
-            if(SelectedCategory == null) return;
+            if(category == null) return;
 
             try
             {
-                var (isSuccess, message) = await _menuService.DeleteCategory(SelectedCategory.Id, CashierState.ManagerEmail!);
+                var (isSuccess, message) = await _menuService.DeleteCategory(category.Id, CashierState.ManagerEmail!);
 
                 if (isSuccess)
                 {

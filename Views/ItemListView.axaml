@@ -22,7 +22,7 @@
                         <Button Click="OnItemClicked"
                                 Margin="5"
                                 Padding="0"
-                                Width="135"
+                                Width="150"
                                 Background="Transparent"
                                 CornerRadius="10">
                             <views:ItemCardView DataContext="{Binding}" />

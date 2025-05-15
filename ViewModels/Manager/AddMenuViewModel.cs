@@ -159,32 +159,100 @@ namespace EBISX_POS.ViewModels.Manager
         /// <returns>True if validation passes, false otherwise</returns>
         private bool ValidateMenuDetails()
         {
-            if (MenuDetails == null)
+            if (MenuDetails is null)
             {
-                ShowError("Menu details cannot be empty");
+                ShowError("Please enter menu details before saving.");
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(MenuDetails.MenuName))
             {
-                ShowError("Menu name is required");
+                ShowError("Menu name is required.");
                 return false;
             }
 
             if (MenuDetails.MenuPrice <= 0)
             {
-                ShowError("Menu price must be greater than 0");
+                ShowError("Menu price must be more than ₱0.00.");
                 return false;
             }
 
-            if (MenuDetails.Category == null || MenuDetails.Category.Id == 0)
+            if (MenuDetails.Category is null || MenuDetails.Category.Id <= 0)
             {
-                ShowError("Please select a category");
+                ShowError("You must choose a valid category.");
+                return false;
+            }
+
+            bool hasAddonType = MenuDetails.AddOnType?.Id > 0;
+            bool hasDrinkType = MenuDetails.DrinkType?.Id > 0;
+            bool flagAddon = MenuDetails.HasAddOn;
+            bool flagDrink = MenuDetails.HasDrink;
+            bool isAddOn = MenuDetails.IsAddOn;
+
+            // 1) If this item itself is marked as an Add-On...
+            if (isAddOn)
+            {
+                if (!hasAddonType)
+                {
+                    ShowError("You marked this item as an Add-On, so you must select an Add-On type.");
+                    return false;
+                }
+                if (flagAddon || flagDrink)
+                {
+                    ShowError("An Add-On item cannot be flagged as Has Add‑On or Has Drink.");
+                    return false;
+                }
+                // All good for pure Add-On items
+                return true;
+            }
+
+            // 2) If AddOnType is chosen for a non–Add-On item, it must not have flags
+            if (hasAddonType)
+            {
+                if (flagAddon || flagDrink)
+                {
+                    ShowError("An item with an Add‑On type cannot also be flagged as Has Add‑On or Has Drink.");
+                    return false;
+                }
+                // valid base item with configured add-on type
+                return true;
+            }
+
+            // 3) If DrinkType is chosen for a non–Add-On item, it must not have flags
+            if (hasDrinkType)
+            {
+                if (flagAddon || flagDrink)
+                {
+                    ShowError("An item with a Drink type cannot also be flagged as Has Add‑On or Has Drink.");
+                    return false;
+                }
+                return true;
+            }
+
+            // 4) Otherwise, require exactly one flag for a base item
+            if (flagAddon == flagDrink)  // both true or both false
+            {
+                ShowError("Please select exactly one menu type: either Has Add‑On or Has Drink (and configure its type).");
+                return false;
+            }
+
+            // 5) If flagged HasAddOn, ensure an AddOnType is set
+            if (flagAddon && !hasAddonType)
+            {
+                ShowError("You checked “Has Add‑On” but did not select an Add‑On type.");
+                return false;
+            }
+
+            // 6) If flagged HasDrink, ensure a DrinkType is set
+            if (flagDrink && !hasDrinkType)
+            {
+                ShowError("You checked “Has Drink” but did not select a Drink type.");
                 return false;
             }
 
             return true;
         }
+
 
         /// <summary>
         /// Command to handle image upload
