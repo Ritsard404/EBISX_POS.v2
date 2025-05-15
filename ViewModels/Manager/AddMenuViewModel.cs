@@ -60,6 +60,15 @@ namespace EBISX_POS.ViewModels.Manager
         private string _availabilityName;
 
         [ObservableProperty]
+        private string _hasAddOnName = "Has Add-On";
+
+        [ObservableProperty]
+        private string _hasDrinkName = "Has Drink";
+
+        [ObservableProperty]
+        private string _isAddOnName = "Is Add-On";
+
+        [ObservableProperty]
         private string _windowTitle = "Add New Menu";
 
         /// <summary>
@@ -92,6 +101,9 @@ namespace EBISX_POS.ViewModels.Manager
             IsEditMode = menuToEdit != null;
             WindowTitle = IsEditMode ? "Edit Menu" : "Add New Menu";
             AvailabilityName = MenuDetails.MenuIsAvailable ? "Available" : "Not Available";
+            HasAddOnName = MenuDetails.HasAddOn ? "Has Add-On ✓" : "Has Add-On";
+            HasDrinkName = MenuDetails.HasDrink ? "Has Drink ✓" : "Has Drink";
+            IsAddOnName = MenuDetails.IsAddOn ? "Is Add-On ✓" : "Is Add-On";
 
             // Load initial data
             _ = LoadCombos();
@@ -100,6 +112,17 @@ namespace EBISX_POS.ViewModels.Manager
             if (IsEditMode && !string.IsNullOrEmpty(MenuDetails.MenuImagePath))
             {
                 _ = LoadExistingImage();
+            }
+        }
+
+        partial void OnMenuDetailsChanged(API.Models.Menu? value)
+        {
+            if (value != null)
+            {
+                AvailabilityName = value.MenuIsAvailable ? "Available" : "Not Available";
+                HasAddOnName = value.HasAddOn ? "Has Add-On ✓" : "Has Add-On";
+                HasDrinkName = value.HasDrink ? "Has Drink ✓" : "Has Drink";
+                IsAddOnName = value.IsAddOn ? "Is Add-On ✓" : "Is Add-On";
             }
         }
 
@@ -236,14 +259,14 @@ namespace EBISX_POS.ViewModels.Manager
             // 5) If flagged HasAddOn, it must NOT have an AddOnType
             if (flagAddon && hasAddonType)
             {
-                ShowError("An item marked “Has Add‑On” cannot also have an Add‑On type selected.");
+                ShowError("An item marked \"Has Add‑On\" cannot also have an Add‑On type selected.");
                 return false;
             }
 
             // 6) If flagged HasDrink, it must NOT have a DrinkType
             if (flagDrink && hasDrinkType)
             {
-                ShowError("An item marked “Has Drink” cannot also have a Drink type selected.");
+                ShowError("An item marked \"Has Drink\" cannot also have a Drink type selected.");
                 return false;
             }
 

@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
-		Width="500" Height="500"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+		Width="500" Height="600"
         x:Class="EBISX_POS.AddMenuWindow"
         xmlns:vm="using:EBISX_POS.ViewModels.Manager"
         x:DataType="vm:AddMenuViewModel"
@@ -66,7 +66,7 @@
 					</Grid>
 				</StackPanel>
 				
-				<!-- Row 1: Name & Price -->
+				<!-- Availability Toggle -->
 				<StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding IsEditMode}">
 					<ToggleButton
 					  Width="130"
@@ -77,66 +77,84 @@
 				
 				<!-- Row 1: Name & Price -->
 				<StackPanel Orientation="Horizontal" Spacing="10">
-					<TextBox
-					  Width="200"
-					  Watermark="Name"
-					  Text="{Binding MenuDetails.MenuName, UpdateSourceTrigger=PropertyChanged}"/>
-					<TextBox
-					  Width="200"
-					  Watermark="Price"
-					  Text="{Binding MenuDetails.MenuPrice, UpdateSourceTrigger=PropertyChanged}"/>
+					<StackPanel>
+						<TextBlock Text="Menu Name" Margin="0,0,0,5"/>
+						<TextBox
+						  Width="200"
+						  Watermark="Name"
+						  Text="{Binding MenuDetails.MenuName, UpdateSourceTrigger=PropertyChanged}"/>
+					</StackPanel>
+					<StackPanel>
+						<TextBlock Text="Price" Margin="0,0,0,5"/>
+						<TextBox
+						  Width="200"
+						  Watermark="Price"
+						  Text="{Binding MenuDetails.MenuPrice, UpdateSourceTrigger=PropertyChanged}"/>
+					</StackPanel>
 				</StackPanel>
 
 				<!-- Row 2: Category & Size -->
 				<StackPanel Orientation="Horizontal" Spacing="10">
-					<ComboBox
-					  Width="200"
-					  ItemsSource="{Binding Categories}"
-					  DisplayMemberBinding="{Binding CtgryName}"
-					  SelectedItem="{Binding MenuDetails.Category}"
-					  PlaceholderText="Select Category"
-					  MaxDropDownHeight="100"/>
-					<ComboBox
-					  Width="200"
-					  ItemsSource="{Binding DrinkSizes}"
-					  SelectedItem="{Binding MenuDetails.Size}"
-					  PlaceholderText="Select Size"
-					  MaxDropDownHeight="100"/>
+					<StackPanel>
+						<TextBlock Text="Category" Margin="0,0,0,5"/>
+						<ComboBox
+						  Width="200"
+						  ItemsSource="{Binding Categories}"
+						  DisplayMemberBinding="{Binding CtgryName}"
+						  SelectedItem="{Binding MenuDetails.Category}"
+						  PlaceholderText="Select Category"
+						  MaxDropDownHeight="100"/>
+					</StackPanel>
+					<StackPanel>
+						<TextBlock Text="Size" Margin="0,0,0,5"/>
+						<ComboBox
+						  Width="200"
+						  ItemsSource="{Binding DrinkSizes}"
+						  SelectedItem="{Binding MenuDetails.Size}"
+						  PlaceholderText="Select Size"
+						  MaxDropDownHeight="100"/>
+					</StackPanel>
 				</StackPanel>
 
 				<!-- Row 3: Add-On & Drink Type -->
 				<StackPanel Orientation="Horizontal" Spacing="10">
-					<ComboBox
-					  Width="200"
-					  ItemsSource="{Binding AddOns}"
-					  DisplayMemberBinding="{Binding AddOnTypeName}"
-					  SelectedItem="{Binding MenuDetails.AddOnType}"
-					  PlaceholderText="Select Add-On Type"
-					  MaxDropDownHeight="100"/>
-					<ComboBox
-					  Width="200"
-					  ItemsSource="{Binding Drinks}"
-					  DisplayMemberBinding="{Binding DrinkTypeName}"
-					  SelectedItem="{Binding MenuDetails.DrinkType}"
-					  PlaceholderText="Select Drink Type"
-					  MaxDropDownHeight="100"/>
+					<StackPanel>
+						<TextBlock Text="Add-On Type" Margin="0,0,0,5"/>
+						<ComboBox
+						  Width="200"
+						  ItemsSource="{Binding AddOns}"
+						  DisplayMemberBinding="{Binding AddOnTypeName}"
+						  SelectedItem="{Binding MenuDetails.AddOnType}"
+						  PlaceholderText="Select Add-On Type"
+						  MaxDropDownHeight="100"/>
+					</StackPanel>
+					<StackPanel>
+						<TextBlock Text="Drink Type" Margin="0,0,0,5"/>
+						<ComboBox
+						  Width="200"
+						  ItemsSource="{Binding Drinks}"
+						  DisplayMemberBinding="{Binding DrinkTypeName}"
+						  SelectedItem="{Binding MenuDetails.DrinkType}"
+						  PlaceholderText="Select Drink Type"
+						  MaxDropDownHeight="100"/>
+					</StackPanel>
 				</StackPanel>
 
 				<!-- Row 4: Flags -->
 				<StackPanel Orientation="Horizontal" Spacing="10">
 					<ToggleButton
 					  Width="130"
-					  Content="Has Add-On"
+					  Content="{Binding HasAddOnName}"
 					  HorizontalContentAlignment="Center"
 					  IsChecked="{Binding MenuDetails.HasAddOn}"/>
 					<ToggleButton
 					  Width="130"
-					  Content="Has Drink"
+					  Content="{Binding HasDrinkName}"
 					  HorizontalContentAlignment="Center"
 					  IsChecked="{Binding MenuDetails.HasDrink}"/>
 					<ToggleButton
 					  Width="130"
-					  Content="Is Add-On"
+					  Content="{Binding IsAddOnName}"
 					  HorizontalContentAlignment="Center"
 					  IsChecked="{Binding MenuDetails.IsAddOn}"/>
 				</StackPanel>
