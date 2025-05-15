@@ -213,6 +213,11 @@ namespace EBISX_POS.ViewModels.Manager
 
         partial void OnSelectedDrinkTypeChanged(DrinkType? value)
         {
+            if (string.IsNullOrWhiteSpace(value?.DrinkTypeName))
+            {
+                ShowError("Type name required.");
+                return;
+            }
             if (value != null)
             {
                 _ = UpdateType(value, _menuService.UpdateDrinkType);
@@ -221,6 +226,12 @@ namespace EBISX_POS.ViewModels.Manager
 
         partial void OnSelectedAddOnTypeChanged(AddOnType? value)
         {
+            if (string.IsNullOrWhiteSpace(value?.AddOnTypeName))
+            {
+                ShowError("Type name required.");
+                return;
+            }
+
             if (value != null)
             {
                 _ = UpdateType(value, _menuService.UpdateAddOnType);
