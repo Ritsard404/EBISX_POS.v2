@@ -233,17 +233,17 @@ namespace EBISX_POS.ViewModels.Manager
                 return true;
             }
 
-            // 5) If flagged HasAddOn, ensure an AddOnType is set
-            if (flagAddon && !hasAddonType)
+            // 5) If flagged HasAddOn, it must NOT have an AddOnType
+            if (flagAddon && hasAddonType)
             {
-                ShowError("You checked “Has Add‑On” but did not select an Add‑On type.");
+                ShowError("An item marked “Has Add‑On” cannot also have an Add‑On type selected.");
                 return false;
             }
 
-            // 6) If flagged HasDrink, ensure a DrinkType is set
-            if (flagDrink && !hasDrinkType)
+            // 6) If flagged HasDrink, it must NOT have a DrinkType
+            if (flagDrink && hasDrinkType)
             {
-                ShowError("You checked “Has Drink” but did not select a Drink type.");
+                ShowError("An item marked “Has Drink” cannot also have a Drink type selected.");
                 return false;
             }
 
