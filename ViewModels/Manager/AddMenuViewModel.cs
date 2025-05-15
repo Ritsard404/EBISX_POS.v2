@@ -57,6 +57,9 @@ namespace EBISX_POS.ViewModels.Manager
         private bool _isEditMode;
 
         [ObservableProperty]
+        private string _availabilityName;
+
+        [ObservableProperty]
         private string _windowTitle = "Add New Menu";
 
         /// <summary>
@@ -88,6 +91,7 @@ namespace EBISX_POS.ViewModels.Manager
             // Set edit mode if menuToEdit is provided
             IsEditMode = menuToEdit != null;
             WindowTitle = IsEditMode ? "Edit Menu" : "Add New Menu";
+            AvailabilityName = MenuDetails.MenuIsAvailable ? "Available" : "Not Available";
 
             // Load initial data
             _ = LoadCombos();
@@ -227,13 +231,6 @@ namespace EBISX_POS.ViewModels.Manager
                     return false;
                 }
                 return true;
-            }
-
-            // 4) Otherwise, require exactly one flag for a base item
-            if (flagAddon == flagDrink)  // both true or both false
-            {
-                ShowError("Please select exactly one menu type: either Has Add‑On or Has Drink (and configure its type).");
-                return false;
             }
 
             // 5) If flagged HasAddOn, ensure an AddOnType is set

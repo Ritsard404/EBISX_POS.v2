@@ -70,7 +70,7 @@
 				<StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding IsEditMode}">
 					<ToggleButton
 					  Width="130"
-					  Content="Available"
+					  Content="{Binding AvailabilityName}"
 					  HorizontalContentAlignment="Center"
 					  IsChecked="{Binding MenuDetails.MenuIsAvailable}"/>
 				</StackPanel>
