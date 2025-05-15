@@ -117,13 +117,13 @@ namespace EBISX_POS.ViewModels
 
                 // Load add-on options
                 var addOnResult = await _menuService.GetAddOns(Item.Id);
-                if (addOnResult != null)
+                if (addOnResult != null && addOnResult.Any())
                 {
                     OptionsState.AddOnsType.Clear();
                     addOnResult.ForEach(addOn => OptionsState.AddOnsType.Add(addOn));
 
                     // Default Display
-                    OptionsState.UpdateAddOns(addOnResult.FirstOrDefault().AddOnTypeId);
+                    OptionsState.UpdateAddOns(addOnResult.First().AddOnTypeId);
 
                 }
                 else
