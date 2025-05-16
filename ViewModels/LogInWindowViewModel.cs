@@ -59,7 +59,7 @@ namespace EBISX_POS.ViewModels
         {
             _authService = authService;
             _menuService = menuService;
-            
+
             InitializeAsync();
         }
         public async void InitializeAsync()
@@ -68,9 +68,9 @@ namespace EBISX_POS.ViewModels
             {
                 // Wait for database initialization to complete
                 await Task.Delay(1000); // Give time for database initialization
-                
+
                 var ebisxService = App.Current.Services.GetRequiredService<IEbisxAPI>();
-                
+
                 // Validate terminal first
                 var (isValid, message) = await ebisxService.ValidateTerminalExpiration();
                 if (!isValid)
@@ -118,7 +118,7 @@ namespace EBISX_POS.ViewModels
 
                     await alertBox.ShowAsPopupAsync(owner);
                 }
-                
+
                 await CheckData(); // this might navigate and close
                 await CheckMode();
                 await LoadCashiersAsync();
@@ -175,7 +175,7 @@ namespace EBISX_POS.ViewModels
                             var managerWindow = new ManagerWindow();
                             desktop.MainWindow = managerWindow;
                             managerWindow.Show();
-                            
+
                             // Close the LoginWindow
                             if (desktop.Windows.FirstOrDefault(w => w is LogInWindow) is LogInWindow loginWindow)
                             {
@@ -228,7 +228,7 @@ namespace EBISX_POS.ViewModels
             {
 
                 IsLoading = true;
-                var (success, cashierEmail, cashierName ) = await _authService.HasPendingOrder();
+                var (success, cashierEmail, cashierName) = await _authService.HasPendingOrder();
                 if (success)
                 {
                     if (_hasNavigated) return;
@@ -280,6 +280,15 @@ namespace EBISX_POS.ViewModels
                 var owner = GetCurrentWindow();
                 ErrorMessage = string.Empty;
                 IsLoading = true;
+    
+
+                if (selectedCashier != null && string.IsNullOrEmpty(ManagerEmail))
+                {
+                    ErrorMessage = "Invalid manager auth.";
+                    OnPropertyChanged(nameof(HasError));
+                    IsLoading = false;
+                    return;
+                }
 
                 var logInDTO = new LogInDTO
                 {
@@ -293,8 +302,8 @@ namespace EBISX_POS.ViewModels
                 {
                     ErrorMessage = result.name;
                     OnPropertyChanged(nameof(HasError));
-                    IsLoading = false; 
-                    
+                    IsLoading = false;
+
                     var alertBox = MessageBoxManager.GetMessageBoxStandard(
                         new MessageBoxStandardParams
                         {
@@ -379,6 +388,8 @@ namespace EBISX_POS.ViewModels
             }
             catch (Exception ex)
             {
+                SelectedCashier = null;
+                ManagerEmail = string.Empty;
                 Debug.WriteLine($"Log in error: {ex.Message}");
                 ErrorMessage = "An unexpected error occurred.";
                 OnPropertyChanged(nameof(HasError));
