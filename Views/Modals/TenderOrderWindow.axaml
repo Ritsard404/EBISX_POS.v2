@@ -465,16 +465,6 @@
 							HorizontalContentAlignment="Center"
 							Command="{Binding TenderButtonClickCommand}"
 							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
-					<Button Content="00"
-							Width="100"
-							Height="50"
-							FontSize="20"
-							FontFamily="{StaticResource NunitoFont}"
-							FontWeight="Black"
-							VerticalContentAlignment="Center"
-							HorizontalContentAlignment="Center"
-							Command="{Binding TenderButtonClickCommand}"
-							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
 					<Button Content="."
 							Width="100"
 							Height="50"
@@ -498,6 +488,25 @@
 									   FontWeight="Black"/>
 						</StackPanel>
 					</Button>
+					<Button Width="100"
+						Height="50"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						Click="ExactAmount_Click">
+						<StackPanel Orientation="Vertical">
+							<TextBlock Text="Exact"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontWeight="Black"/>
+							<TextBlock Text="Amount"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontWeight="Black"/>
+						</StackPanel>
+					</Button>
+					
 				</StackPanel>
 			</Grid>
 

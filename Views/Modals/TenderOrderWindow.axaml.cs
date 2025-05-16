@@ -118,6 +118,70 @@ namespace EBISX_POS.Views
                 ShowLoader(false);
             }
         }
+        private async void ExactAmount_Click(object? sender, RoutedEventArgs e)
+        {
+            ShowLoader(true);
+            try
+            {// calculate totals up front
+                var order = TenderState.tenderOrder;
+                var due = order.AmountDue;
+
+                if ((order.OtherPayments?.Any() ?? false))
+                {
+                    await ShowWarningAsync("Invalid Tender",
+                        "Exact‑amount payment can’t be combined with other payment types.");
+                    return;
+                }
+
+                if (due != 0m)
+                {
+                    await ShowWarningAsync("Invalid Tender",
+                        $"Cannot use Exact Amount: you still owe {due:C}.");
+                    return;
+                }
+
+                // prepare your DTO
+                var finalizeDto = new FinalizeOrderDTO
+                {
+                    TotalAmount = order.TotalAmount,
+                    CashTendered = order.TotalAmount,
+                    OrderType = order.OrderType,
+                    DiscountAmount = order.DiscountAmount,
+                    ChangeAmount = 0m,
+                    DueAmount = 0m,
+                    VatExempt = order.VatExemptSales,
+                    VatAmount = order.VatAmount,
+                    VatSales = order.VatSales,
+                    TotalTendered = order.TotalAmount,
+                    CashierEmail = CashierState.CashierEmail ?? ""
+                };
+
+                // services
+                var paymentSvc = App.Current.Services.GetRequiredService<PaymentService>();
+                var orderSvc = App.Current.Services.GetRequiredService<OrderService>();
+
+                // record other payments, finalize, print
+
+                var otherPayments = order.OtherPayments?.ToList()
+                                    ?? new List<AddAlternativePaymentsDTO>();
+
+                await paymentSvc.AddAlternativePayments(otherPayments);
+                var posInfo = await orderSvc.FinalizeOrder(finalizeDto);
+                await GenerateAndPrintReceiptAsync(posInfo.Response);
+
+                // reset
+                OrderState.CurrentOrderItem = new();
+                OrderState.CurrentOrder.Clear();
+                OrderState.CurrentOrderItem.RefreshDisplaySubOrders();
+                TenderState.tenderOrder.Reset();
+
+                Close();
+            }
+            finally
+            {
+                ShowLoader(false);
+            }
+        }
 
         /// Centralized warning dialog for insufficient/invalid tenders.
         private Task ShowWarningAsync(string header, string message)
@@ -221,25 +285,16 @@ namespace EBISX_POS.Views
                                 return;
                             }
 
-                            var result = await MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
-                            {
-                                ContentHeader = "Apply Promo Discount",
-                                ContentMessage = "Manager authorization is required to apply a promo discount. Please ask the manager to swipe their card.",
-                                ButtonDefinitions = ButtonEnum.OkCancel,
-                                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                                CanResize = false,
-                                SizeToContent = SizeToContent.WidthAndHeight,
-                                Width = 400,
-                                ShowInCenter = true,
-                                Icon = MsBox.Avalonia.Enums.Icon.Warning
-                            }).ShowAsPopupAsync(this);
+                            var swipeManager = new ManagerSwipeWindow(header: "Apply Promo Discount", message: "Please enter manager email.", ButtonName: "Submit");
+                            var (success, email) = await swipeManager.ShowDialogAsync(this);
 
-                            if (result == ButtonResult.Ok)
+                            if (success)
                             {
                                 var promoWindow = new DiscountCodeWindow("PROMO");
                                 await promoWindow.ShowDialog((Window)this.VisualRoot);
                             }
-                            break;
+
+                            return;
                         }
                     case "COUPON":
                         {
@@ -260,25 +315,15 @@ namespace EBISX_POS.Views
                                 return;
                             }
 
+                            var swipeManager = new ManagerSwipeWindow(header: "Apply Coupon Discount", message: "Please enter manager email.", ButtonName: "Submit");
+                            var (success, email) = await swipeManager.ShowDialogAsync(this);
 
-                            var result = await MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
-                            {
-                                ContentHeader = "Apply Coupon Discount",
-                                ContentMessage = "Manager authorization is required to apply a coupon discount. Please ask the manager to swipe their card.",
-                                ButtonDefinitions = ButtonEnum.OkCancel,
-                                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                                CanResize = false,
-                                SizeToContent = SizeToContent.WidthAndHeight,
-                                Width = 400,
-                                ShowInCenter = true,
-                                Icon = MsBox.Avalonia.Enums.Icon.Warning
-                            }).ShowAsPopupAsync(this);
-
-                            if (result == ButtonResult.Ok)
+                            if (success)
                             {
                                 var promoWindow = new DiscountCodeWindow("COUPON");
                                 await promoWindow.ShowDialog((Window)this.VisualRoot);
                             }
+
                             return;
                         }
                     default:
