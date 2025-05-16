@@ -48,7 +48,7 @@ namespace EBISX_POS.Util
 
             EnsureDirectoryExists(reportPath);
 
-            string fileName = $"XInvoice-{DateTimeOffset.UtcNow.ToString("MMMM-dd-yyyy-HH-mm-ss")}.txt";
+            string fileName = $"XInvoice-{DateTime.UtcNow.ToString("MMMM-dd-yyyy-HH-mm-ss")}.txt";
             var filePath = Path.Combine(reportPath, fileName);
 
             using var writer = new StreamWriter(filePath);
