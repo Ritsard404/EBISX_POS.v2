@@ -415,15 +415,16 @@ namespace EBISX_POS.Util
             writer.WriteLine($"{"Qty",-5} {"Description",-30} {"Amount",10}");
             writer.WriteLine(new string('-', ReceiptWidth));
             writer.WriteLine();
-
             // Invoice items
             foreach (var item in invoice.Items)
             {
                 foreach (var itemInfo in item.itemInfos)
                 {
                     // Column 0: Fixed width (5 characters). Only show quantity if opacity is 1.
-                    string quantityColumn = $"{item.Qty,-5}";
 
+                    string quantityColumn = item.IsFirstItem ? 1.0 : 0.0 < 1.0
+                        ? new string(' ', 5)
+                        : $"{item.Qty,-5}";
                     // Column 1: Description in a left-aligned, fixed-width field (30 characters).
                     string descriptionColumn = $"{itemInfo.Description,-30}";
 

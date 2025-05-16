@@ -97,6 +97,7 @@ namespace EBISX_POS.Services.DTO.Report
     {
         public required string Description { get; set; }
         public required string Amount { get; set; }
+        public bool IsFirstItem { get; set; }
 
         public static ItemInfoDTO CreateEmpty()
         {

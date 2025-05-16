@@ -415,11 +415,12 @@ namespace EBISX_POS.Services
                     CashierName = apiResponse.CashierName,
 
                     // Items
-                    Items = apiResponse.Items?.Select(item => new ItemDTO
+                    Items = apiResponse.Items?.Select((item, index) => new ItemDTO
                     {
                         Qty = item.Qty,
                         itemInfos = item.itemInfos?.Select(info => new ItemInfoDTO
                         {
+                            IsFirstItem = (index == 0),
                             Description = info.Description,
                             Amount = info.Amount
                         }).ToList() ?? new List<ItemInfoDTO>()

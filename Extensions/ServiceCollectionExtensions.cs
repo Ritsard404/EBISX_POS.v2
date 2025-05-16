@@ -34,7 +34,7 @@ namespace EBISX_POS.API.Extensions
             services.AddRepositories();
 
             // Add logging
-            services.AddLogging();
+            //services.AddLogging();
 
             return services;
         }
@@ -52,14 +52,10 @@ namespace EBISX_POS.API.Extensions
                 });
 
                 if (dbSettings.EnableDetailedErrors)
-                {
                     options.EnableDetailedErrors();
-                }
 
                 if (dbSettings.EnableSensitiveDataLogging)
-                {
                     options.EnableSensitiveDataLogging();
-                }
 
                 var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
                 options.UseLoggerFactory(loggerFactory);
@@ -73,14 +69,10 @@ namespace EBISX_POS.API.Extensions
                 });
 
                 if (dbSettings.EnableDetailedErrors)
-                {
                     options.EnableDetailedErrors();
-                }
 
                 if (dbSettings.EnableSensitiveDataLogging)
-                {
                     options.EnableSensitiveDataLogging();
-                }
 
                 var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
                 options.UseLoggerFactory(loggerFactory);
