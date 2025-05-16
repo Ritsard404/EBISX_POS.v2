@@ -47,7 +47,7 @@ namespace EBISX_POS.State
         }
 
 
-        public static void UpdateItemOrder(string itemType, int itemId, string name, decimal price, string? size)
+        public static void UpdateItemOrder(string itemType, int itemId, string name, decimal price, string? size, bool? hasDrink, bool? hasAddOn)
         {
             // Determine the correct predicate based on the item type.
             Func<SubOrderItem, bool> predicate = itemType switch
@@ -59,6 +59,8 @@ namespace EBISX_POS.State
 
             // Look for an existing sub-order that matches the predicate.
             var item = CurrentOrderItem.SubOrders.FirstOrDefault(predicate);
+            CurrentOrderItem.HasDrinks = hasDrink ?? false;
+            CurrentOrderItem.HasAddOns = hasAddOn ?? false;
 
             if (item != null)
             {
@@ -66,6 +68,7 @@ namespace EBISX_POS.State
                 item.Name = name;
                 item.ItemPrice = price;
                 item.Size = size;
+                
 
                 // Optionally update the ID field, if needed.
                 if (itemType == "Drink")
@@ -108,12 +111,22 @@ namespace EBISX_POS.State
 
             var subOrders = CurrentOrderItem?.DisplaySubOrders;
 
+            var hasDrinks = CurrentOrderItem?.HasDrinks;
+            var hasAddOns = CurrentOrderItem?.HasAddOns;
+
             var isNoDrinks = CurrentOrderItem.SubOrders
                 .All(s => s.DrinkId == null);
             var isNoAddOn = CurrentOrderItem.SubOrders
                 .All(s => s.AddOnId == null);
 
-            if (!isSolo && (isNoDrinks || isNoAddOn))
+            if (!isSolo
+                && (
+                     (hasDrinks == true && isNoDrinks)
+                     ||
+                     (hasAddOns == true && isNoAddOn)
+                   )
+            )
+            //if (!isSolo && (isNoDrinks || isNoAddOn))
             {
 
                 //var parentWindow = this.VisualRoot as Window; // Find the parent window

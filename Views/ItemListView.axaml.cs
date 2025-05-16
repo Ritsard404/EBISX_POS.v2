@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 using EBISX_POS.State;
 using EBISX_POS.API.Models;
 using System.Linq;
+using MsBox.Avalonia.Dto;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
 
 namespace EBISX_POS.Views
 {
@@ -60,6 +63,56 @@ namespace EBISX_POS.Views
             {
                 HandleSelection(ref _selectedItemButton, clickedButton, ref _selectedItem);
 
+
+                var drinksResult = await _menuService.GetDrinks(item.Id);
+                var addOnResult = await _menuService.GetAddOns(item.Id);
+
+                if (item.HasDrink && !drinksResult.DrinkTypesWithDrinks.Any())
+                {
+                    // Show a warning
+                    var msg = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                    {
+                        ContentTitle = "No Drinks Available",
+                        ContentMessage = "Sorry, this item is flagged to include a drink, but none are available at the moment.",
+                        ButtonDefinitions = ButtonEnum.Ok,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        CanResize = false,
+                        SizeToContent = SizeToContent.WidthAndHeight,
+                        Width = 400,
+                        SystemDecorations = SystemDecorations.None,
+                        ShowInCenter = true,
+                    });
+
+                    // Display as a standalone dialog so you don’t need a DialogHost
+                    await msg.ShowAsPopupAsync((Window)this.VisualRoot);
+                    // bail out of LoadOptions so you don’t hit First() on an empty list
+                    return;
+                }
+
+                if (item.HasAddOn && !addOnResult.Any())
+                {
+                    // Show a warning
+                    var msg = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                    {
+                        ContentTitle = "No Add-On Available",
+                        ContentMessage = "Sorry, this item is flagged to include an add-on, but none are available at the moment.",
+                        ButtonDefinitions = ButtonEnum.Ok,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        CanResize = false,
+                        SizeToContent = SizeToContent.WidthAndHeight,
+                        Width = 400,
+                        SystemDecorations = SystemDecorations.None,
+                        ShowInCenter = true,
+                    });
+
+                    // Display as a standalone dialog so you don’t need a DialogHost
+                    await msg.ShowAsPopupAsync((Window)this.VisualRoot);
+
+                    // bail out of LoadOptions so you don’t hit First() on an empty list
+                    return;
+                }
+
+
                 if (item.IsSolo || item.IsAddOn)
                 {
                     var owner = this.VisualRoot as Window;
@@ -70,7 +123,7 @@ namespace EBISX_POS.Views
                     }
 
                     // Determine the item type based on the item's properties.
-                    string itemType = item.IsDrink ? "Drink" : item.IsAddOn ? "AddOn" : "Menu";
+                    string itemType = item.IsDrink ? "Drink" : item.IsAddOn ? "Add-On" : "Menu";
 
                     // Clear the current sub-orders.
                     OrderState.CurrentOrderItem.SubOrders.Clear();
@@ -81,7 +134,9 @@ namespace EBISX_POS.Views
                         itemId: item.Id,
                         name: item.ItemName + (item.IsSolo ? " (Solo)" : ""),
                         price: item.Price,
-                        size: item.Size
+                        size: item.Size,
+                        hasAddOn: item.HasAddOn,
+                        hasDrink: item.HasDrink
                     );
 
 
@@ -107,12 +162,10 @@ namespace EBISX_POS.Views
                 OrderState.CurrentOrderItem.Quantity = (OrderState.CurrentOrderItem.Quantity < 1)
                     ? 1
                     : OrderState.CurrentOrderItem.Quantity;
-                OrderState.UpdateItemOrder(itemType: "Menu", itemId: item.Id, name: item.ItemName, price: item.Price, size: null);
+                OrderState.UpdateItemOrder(itemType: "Menu", itemId: item.Id, name: item.ItemName, price: item.Price, size: null, hasAddOn: false, hasDrink: false);
 
-                var detailsWindow = new SubItemWindow(item, _menuService)
-                {
-                    DataContext = new SubItemWindowViewModel(item, _menuService)
-                };
+                var detailsWindow = new SubItemWindow(item, _menuService);
+                detailsWindow.DataContext = new SubItemWindowViewModel(item, _menuService, detailsWindow);
 
 
                 await detailsWindow.ShowDialog((Window)this.VisualRoot);

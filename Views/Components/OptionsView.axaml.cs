@@ -48,18 +48,18 @@ namespace EBISX_POS.Views
                 {
                     HandleSelection(ref _selectedDrinksButton, clickedButton, ref _selectedDrink);
 
-                    OrderState.UpdateItemOrder(itemType: "Drink", itemId: Drink.MenuId, name: Drink.MenuName, price: Drink.MenuPrice, size: SelectedOptionsState.SelectedSize);
+                    OrderState.UpdateItemOrder(itemType: "Drink", itemId: Drink.MenuId, name: Drink.MenuName, price: Drink.MenuPrice, size: SelectedOptionsState.SelectedSize, hasAddOn: false, hasDrink: false);
 
-                    Debug.WriteLine($"Selected Drink: {Drink.MenuId}");
+                    //Debug.WriteLine($"Selected Drink: {Drink.MenuId}");
                     //OrderState.DisplayOrders();
                 }
                 else if (clickedButton.DataContext is AddOnDetailDTO AddOn)
                 {
                     HandleSelection(ref _selectedAddOnButton, clickedButton, ref _selectedAddOn);
 
-                    OrderState.UpdateItemOrder(itemType: "AddOn", itemId: AddOn.MenuId, name: AddOn.MenuName, price: AddOn.Price, size: AddOn.Size);
+                    OrderState.UpdateItemOrder(itemType: "AddOn", itemId: AddOn.MenuId, name: AddOn.MenuName, price: AddOn.Price, size: AddOn.Size, hasAddOn: false, hasDrink: false);
 
-                    Debug.WriteLine($"Selected AddOn: {AddOn.MenuName} Size: {AddOn.Size}");
+                    //Debug.WriteLine($"Selected AddOn: {AddOn.MenuName} Size: {AddOn.Size}");
                     //OrderState.DisplayOrders();
 
                 }
@@ -67,7 +67,7 @@ namespace EBISX_POS.Views
                 {
                     HandleSelection(ref _selectedAddOnTypeButton, clickedButton, ref _selectedAddOnType);
                     OptionsState.UpdateAddOns(selectedAddOnType.AddOnTypeId);
-                    Debug.WriteLine($"Selected AddOns Type: {selectedAddOnType.AddOnTypeName} Id: {selectedAddOnType.AddOnTypeId}");
+                    //Debug.WriteLine($"Selected AddOns Type: {selectedAddOnType.AddOnTypeName} Id: {selectedAddOnType.AddOnTypeId}");
                 }
                 else if (clickedButton.DataContext is DrinkTypeDTO selectedDrinkType)
                 {
@@ -76,7 +76,7 @@ namespace EBISX_POS.Views
                     OptionsState.UpdateDrinks(selectedDrinkType.DrinkTypeId, SelectedOptionsState.SelectedSize);
 
 
-                    Debug.WriteLine($"Selected Drink Type: {selectedDrinkType.DrinkTypeName} Id: {selectedDrinkType.DrinkTypeId}");
+                    //Debug.WriteLine($"Selected Drink Type: {selectedDrinkType.DrinkTypeName} Id: {selectedDrinkType.DrinkTypeId}");
                 }
                 // If the button is inside an ItemsControl (for sizes)
                 else if (clickedButton.DataContext is string size)
@@ -84,12 +84,12 @@ namespace EBISX_POS.Views
                     HandleSelection(ref _selectedSizeButton, clickedButton, ref _selectedSize);
                     SelectedOptionsState.SelectedSize = size;
                     OptionsState.UpdateDrinks(SelectedOptionsState.SelectedDrinkType, size);
-                    Debug.WriteLine($"Selected Size: {size}");
+                    //Debug.WriteLine($"Selected Size: {size}");
                 }
                 else if (clickedButton.DataContext is ItemMenu item)
                 {
                     HandleSelection(ref _selectedItemButton, clickedButton, ref _selectedItem);
-                    Debug.WriteLine($"Selected Item: {item.ItemName}");
+                    //Debug.WriteLine($"Selected Item: {item.ItemName}");
                 }
             }
         }

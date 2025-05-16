@@ -158,7 +158,7 @@ namespace EBISX_POS.Views
                 if (!OrderState.CurrentOrderItem.SubOrders.Any())
                 {
                     OrderState.CurrentOrderItem.Quantity = digit;
-                    OrderState.UpdateItemOrder(itemType: "Menu", itemId: 0, name: "Select Menu", price: 0, size: null);
+                    OrderState.UpdateItemOrder(itemType: "Menu", itemId: 0, name: "Select Menu", price: 0, size: null, false, false);
                     OrderState.CurrentOrderItem.RefreshDisplaySubOrders();
                     return;
                 }

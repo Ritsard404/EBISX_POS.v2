@@ -100,7 +100,9 @@ namespace EBISX_POS.Services
                 HasSize = menu.Size != null,
                 IsSolo = !menu.HasDrink && menu.DrinkType == null && menu.IsAddOn == false,
                 IsAddOn = menu.AddOnType != null || menu.IsAddOn,
-                IsDrink = menu.DrinkType != null
+                IsDrink = menu.DrinkType != null,
+                HasAddOn = menu.HasAddOn,
+                HasDrink = menu.HasDrink,
             }).ToList();
             try
             {

@@ -12,8 +12,9 @@ namespace EBISX_POS.Services
     {
         public static async void NetworkIssueMessage()
         {
-            var lifetime = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-            var owner = lifetime?.MainWindow;
+            var desktop = Application.Current?.ApplicationLifetime
+                             as IClassicDesktopStyleApplicationLifetime;
+            var owner = desktop?.MainWindow as Window;
 
             var alertBox = MessageBoxManager.GetMessageBoxStandard(
                 new MessageBoxStandardParams

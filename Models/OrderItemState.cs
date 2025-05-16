@@ -36,6 +36,9 @@ namespace EBISX_POS.Models
         public decimal? PromoDiscountAmount { get; set; }
         public string? CouponCode { get; set; }
 
+        public bool HasDrinks { get; set; } = false;
+        public bool HasAddOns { get; set; } = false;
+
         // Using ObservableCollection so UI is notified on add/remove.
         [ObservableProperty]
         private ObservableCollection<SubOrderItem> subOrders = new ObservableCollection<SubOrderItem>();

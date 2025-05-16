@@ -14,7 +14,7 @@ namespace EBISX_POS.Views
         public SubItemWindow(ItemMenu item, MenuService menuService)
         {
             InitializeComponent();
-            DataContext = new SubItemWindowViewModel(item, menuService);
+            DataContext = new SubItemWindowViewModel(item, menuService, this);
 
         }
 

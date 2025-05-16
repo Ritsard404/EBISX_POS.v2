@@ -12,6 +12,8 @@ namespace EBISX_POS.Models
         public required decimal Price { get; set; }
         public string? Size { get; set; }
         public bool HasSize { get; set; }
+        public bool HasAddOn { get; set; }
+        public bool HasDrink { get; set; }
         public bool IsSolo { get; set; }
         public bool  IsAddOn { get; set; }
         public bool  IsDrink { get; set; }
