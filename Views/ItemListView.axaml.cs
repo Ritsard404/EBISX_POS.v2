@@ -64,56 +64,29 @@ namespace EBISX_POS.Views
                 HandleSelection(ref _selectedItemButton, clickedButton, ref _selectedItem);
 
 
-                var drinksResult = await _menuService.GetDrinks(item.Id);
-                var addOnResult = await _menuService.GetAddOns(item.Id);
+                var getDrinksTask = _menuService.GetDrinks(item.Id);
+                var getAddOnsTask = _menuService.GetAddOns(item.Id);
 
-                if (item.HasDrink && !drinksResult.DrinkTypesWithDrinks.Any())
+                await Task.WhenAll(getDrinksTask, getAddOnsTask);
+                var drinksResult = getDrinksTask.Result;
+                var addOnResult = getAddOnsTask.Result;
+
+                if (await ShowAvailabilityWarningAsync(item.HasDrink, drinksResult.DrinkTypesWithDrinks.Any(),
+                    "No Drinks Available",
+                    "Sorry, this item is flagged to include a drink, but none are available at the moment."))
                 {
-                    // Show a warning
-                    var msg = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
-                    {
-                        ContentTitle = "No Drinks Available",
-                        ContentMessage = "Sorry, this item is flagged to include a drink, but none are available at the moment.",
-                        ButtonDefinitions = ButtonEnum.Ok,
-                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                        CanResize = false,
-                        SizeToContent = SizeToContent.WidthAndHeight,
-                        Width = 400,
-                        SystemDecorations = SystemDecorations.None,
-                        ShowInCenter = true,
-                    });
-
-                    // Display as a standalone dialog so you don’t need a DialogHost
-                    await msg.ShowAsPopupAsync((Window)this.VisualRoot);
-                    // bail out of LoadOptions so you don’t hit First() on an empty list
                     return;
                 }
 
-                if (item.HasAddOn && !addOnResult.Any())
+                if (await ShowAvailabilityWarningAsync(item.HasAddOn, addOnResult.Any(),
+                    "No Add-On Available",
+                    "Sorry, this item is flagged to include an add-on, but none are available at the moment."))
                 {
-                    // Show a warning
-                    var msg = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
-                    {
-                        ContentTitle = "No Add-On Available",
-                        ContentMessage = "Sorry, this item is flagged to include an add-on, but none are available at the moment.",
-                        ButtonDefinitions = ButtonEnum.Ok,
-                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                        CanResize = false,
-                        SizeToContent = SizeToContent.WidthAndHeight,
-                        Width = 400,
-                        SystemDecorations = SystemDecorations.None,
-                        ShowInCenter = true,
-                    });
-
-                    // Display as a standalone dialog so you don’t need a DialogHost
-                    await msg.ShowAsPopupAsync((Window)this.VisualRoot);
-
-                    // bail out of LoadOptions so you don’t hit First() on an empty list
                     return;
                 }
 
 
-                if (item.IsSolo || item.IsAddOn)
+                if (item.IsSolo || item.IsAddOn ||(!item.HasDrink && !item.HasAddOn))
                 {
                     var owner = this.VisualRoot as Window;
 
@@ -184,6 +157,27 @@ namespace EBISX_POS.Views
                 selectedButton = clickedButton;
                 selectedValue = clickedButton.Content?.ToString();
             }
+        }
+        private async Task<bool> ShowAvailabilityWarningAsync(bool featureEnabled, bool hasData, string title, string message)
+        {
+            if (!featureEnabled || hasData) return false;
+
+            var msg = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+            {
+                ContentHeader = title,
+                ContentMessage = message,
+                ButtonDefinitions = ButtonEnum.Ok,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                CanResize = false,
+                SizeToContent = SizeToContent.WidthAndHeight,
+                Width = 400,
+                SystemDecorations = SystemDecorations.None,
+                Icon= Icon.Info,
+                ShowInCenter = true,
+            });
+
+            await msg.ShowAsPopupAsync((Window)this.VisualRoot);
+            return true;
         }
     }
 }
