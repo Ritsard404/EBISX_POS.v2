@@ -241,6 +241,12 @@ namespace EBISX_POS.ViewModels.Manager
                     ShowError("An item with an Add‑On type cannot also be flagged as Has Add‑On or Has Drink.");
                     return false;
                 }
+
+                if (!isAddOn)
+                {
+                    ShowError("An item not marked as an Add-On it must also have an Add-On type selected.");
+                    return false;
+                }
                 // valid base item with configured add-on type
                 return true;
             }

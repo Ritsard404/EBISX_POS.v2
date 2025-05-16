@@ -53,7 +53,7 @@ namespace EBISX_POS.State
             Func<SubOrderItem, bool> predicate = itemType switch
             {
                 "Drink" => c => c.DrinkId != null,
-                "AddOn" => c => c.AddOnId != null,
+                "Add-On" => c => c.AddOnId != null,
                 "Menu" => c => c.MenuId != null,
             };
 
@@ -73,7 +73,7 @@ namespace EBISX_POS.State
                 // Optionally update the ID field, if needed.
                 if (itemType == "Drink")
                     item.DrinkId = itemId;
-                else if (itemType == "AddOn")
+                else if (itemType == "Add-On")
                     item.AddOnId = itemId;
                 else if (itemType == "Menu")
                     item.MenuId = itemId;
@@ -92,7 +92,7 @@ namespace EBISX_POS.State
 
                 if (itemType == "Drink")
                     newItem.DrinkId = itemId;
-                else if (itemType == "AddOn")
+                else if (itemType == "Add-On")
                     newItem.AddOnId = itemId;
                 else
                     newItem.MenuId = itemId;
