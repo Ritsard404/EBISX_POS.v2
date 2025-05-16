@@ -82,6 +82,7 @@ namespace EBISX_POS.Services.DTO.Report
     {
         public required int Qty { get; set; }
         public List<ItemInfoDTO> itemInfos { get; set; } = new();
+        public bool IsFirstItem { get; set; }
 
         public static ItemDTO CreateEmpty()
         {
@@ -97,7 +98,6 @@ namespace EBISX_POS.Services.DTO.Report
     {
         public required string Description { get; set; }
         public required string Amount { get; set; }
-        public bool IsFirstItem { get; set; }
 
         public static ItemInfoDTO CreateEmpty()
         {

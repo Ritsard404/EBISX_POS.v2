@@ -99,6 +99,11 @@ namespace EBISX_POS.Views
                     .GetMessageBoxStandard("Invalid Input", "Input field is required.", ButtonEnum.Ok)
                     .ShowAsPopupAsync(this);
 
+                if (_cashDrawer != "Cash-In")
+                {
+                    Close(false);
+                }
+
                 return;
             }
 
