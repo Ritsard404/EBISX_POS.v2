@@ -128,5 +128,17 @@ namespace EBISX_POS.Models
                 ChangeAmount = TenderAmount - AmountDue;
             }
         }
+
+        public void ApplyExactAmount()
+        {
+            // clear any partial tenders or alt payments
+            CashTenderAmount = 0m;
+            OtherPayments = null;
+
+            // force exact tender
+            CashTenderAmount = AmountDue;
+            // TenderAmount is calculated in UpdateComputedValues()
+            UpdateComputedValues();
+        }
     }
 }

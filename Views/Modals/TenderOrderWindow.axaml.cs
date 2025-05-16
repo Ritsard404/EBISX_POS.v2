@@ -126,33 +126,29 @@ namespace EBISX_POS.Views
                 var order = TenderState.tenderOrder;
                 var due = order.AmountDue;
 
-                if ((order.OtherPayments?.Any() ?? false))
+                if (order.TenderAmount > 0m)
                 {
                     await ShowWarningAsync("Invalid Tender",
-                        "Exact‑amount payment can’t be combined with other payment types.");
+                        "Exact‑amount payment can’t be processed because a prior tender already exists.");
                     return;
                 }
 
-                if (due != 0m)
-                {
-                    await ShowWarningAsync("Invalid Tender",
-                        $"Cannot use Exact Amount: you still owe {due:C}.");
-                    return;
-                }
+                order.ApplyExactAmount();
+
 
                 // prepare your DTO
                 var finalizeDto = new FinalizeOrderDTO
                 {
                     TotalAmount = order.TotalAmount,
-                    CashTendered = order.TotalAmount,
+                    CashTendered = order.CashTenderAmount,
                     OrderType = order.OrderType,
                     DiscountAmount = order.DiscountAmount,
-                    ChangeAmount = 0m,
-                    DueAmount = 0m,
+                    ChangeAmount = order.ChangeAmount,
+                    DueAmount = due,
                     VatExempt = order.VatExemptSales,
                     VatAmount = order.VatAmount,
                     VatSales = order.VatSales,
-                    TotalTendered = order.TotalAmount,
+                    TotalTendered = order.TenderAmount,
                     CashierEmail = CashierState.CashierEmail ?? ""
                 };
 
