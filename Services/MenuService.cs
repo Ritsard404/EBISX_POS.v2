@@ -97,7 +97,7 @@ namespace EBISX_POS.Services
                 Price = menu.MenuPrice,
                 ImagePath = menu.MenuImagePath ?? string.Empty,
                 Size = menu.Size?.ToString() ?? string.Empty,
-                HasSize = string.IsNullOrEmpty(menu.Size),
+                HasSize = !string.IsNullOrEmpty(menu.Size),
                 IsSolo = !menu.HasDrink && menu.DrinkType == null && menu.IsAddOn == false,
                 IsAddOn = menu.AddOnType != null || menu.IsAddOn,
                 IsDrink = menu.DrinkType != null,
