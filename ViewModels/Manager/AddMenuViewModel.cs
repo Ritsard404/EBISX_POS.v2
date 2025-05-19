@@ -41,7 +41,7 @@ namespace EBISX_POS.ViewModels.Manager
         private List<string> _drinkSizes = new List<string>
         {
             "",
-            "S",
+            "R",
             "M",
             "L",
             "XL"
