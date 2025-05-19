@@ -422,7 +422,7 @@ namespace EBISX_POS.Util
                 {
                     // Column 0: Fixed width (5 characters). Only show quantity if opacity is 1.
 
-                    string quantityColumn = item.IsFirstItem
+                    string quantityColumn = itemInfo.IsFirstItem
                         ? $"{item.Qty,-5}"
                         : new string(' ', 5);
                     // Column 1: Description in a left-aligned, fixed-width field (30 characters).

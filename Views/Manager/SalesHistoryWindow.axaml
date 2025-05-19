@@ -98,7 +98,8 @@
 								<Button
 									HorizontalAlignment="Center"
 									Content="Print"
-									Click="Button_Click"/>
+									Click="Button_Click"
+									Tag="{Binding}"/>
 							</DataTemplate>
 						</DataGridTemplateColumn.CellTemplate>
 					</DataGridTemplateColumn>

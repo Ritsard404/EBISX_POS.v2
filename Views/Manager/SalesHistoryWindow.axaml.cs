@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using EBISX_POS.Services;
 using EBISX_POS.Util;
+using EBISX_POS.API.Models;
+using EBISX_POS.Services.DTO.Report;
 
 namespace EBISX_POS.Views.Manager
 {
@@ -37,36 +39,40 @@ namespace EBISX_POS.Views.Manager
         {
             // Get the ViewModel from DataContext
             var viewModel = DataContext as SalesHistoryViewModel;
-
-            if (viewModel != null)
+            if (sender is Button button && button.Tag is InvoiceDTO printInvoice)
             {
-                // Access the selectedInvoice
-                var selectedInvoice = viewModel.SelectedInvoice;
 
-                // Perform actions based on the selected invoice, for example:
-                if (selectedInvoice != null)
+                if (viewModel != null)
                 {
-                    ShowLoader(true);
+                    // Access the selectedInvoice
+                    var selectedInvoice = printInvoice;
+                    //var selectedInvoice = viewModel.SelectedInvoice;
 
-                    // Do something with the selectedInvoice, like generating a report
-                    var reportOptions = App.Current.Services.GetRequiredService<IOptions<SalesReport>>();
-                    var reportService = App.Current.Services.GetRequiredService<ReportService>();
+                    // Perform actions based on the selected invoice, for example:
+                    if (selectedInvoice != null)
+                    {
+                        ShowLoader(true);
 
-                    var invoice = await reportService.GetInvoiceById(selectedInvoice.InvoiceNum);
+                        // Do something with the selectedInvoice, like generating a report
+                        var reportOptions = App.Current.Services.GetRequiredService<IOptions<SalesReport>>();
+                        var reportService = App.Current.Services.GetRequiredService<ReportService>();
 
-                    string folderPath = reportOptions.Value.SearchedInvoice;
-                    string fileName = $"Receipt-{DateTimeOffset.UtcNow.ToString("MMMM-dd-yyyy-HH-mm-ss")}.txt";
-                    string filePath = Path.Combine(folderPath, fileName);
+                        var invoice = await reportService.GetInvoiceById(selectedInvoice.InvoiceNum);
 
-                    ReceiptPrinterUtil.PrintSearchedInvoice(folderPath, filePath, invoice);
-                    ShowLoader(false);
+                        string folderPath = reportOptions.Value.SearchedInvoice;
+                        string fileName = $"Receipt-{DateTimeOffset.UtcNow.ToString("MMMM-dd-yyyy-HH-mm-ss")}.txt";
+                        string filePath = Path.Combine(folderPath, fileName);
 
-                }
-                else
-                {
-                    // Handle the case when no invoice is selected
-                    await MessageBoxManager.GetMessageBoxStandard("No Invoice Selected", "Please select an invoice.", ButtonEnum.Ok)
-                        .ShowAsPopupAsync(this);
+                        ReceiptPrinterUtil.PrintSearchedInvoice(folderPath, filePath, invoice);
+                        ShowLoader(false);
+
+                    }
+                    else
+                    {
+                        // Handle the case when no invoice is selected
+                        await MessageBoxManager.GetMessageBoxStandard("No Invoice Selected", "Please select an invoice.", ButtonEnum.Ok)
+                            .ShowAsPopupAsync(this);
+                    }
                 }
             }
         }
