@@ -255,24 +255,24 @@ namespace EBISX_POS.Views
                     orderType = btn.Content?.ToString() ?? string.Empty;
                 }
 
-                if(OrderState.CurrentOrder.Count() < 1)
-                {
-                    var dbox = MessageBoxManager.GetMessageBoxStandard(
-                        new MessageBoxStandardParams
-                        {
-                            ContentHeader = "No Pending Orders",
-                            ContentMessage = "You don’t have any orders in progress. Please create or select an order before continuing.",
-                            ButtonDefinitions = ButtonEnum.Ok, // Defines the available buttons
-                            WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                            CanResize = false,
-                            SizeToContent = SizeToContent.WidthAndHeight,
-                            Width = 400,
-                            ShowInCenter = true,
-                            Icon = MsBox.Avalonia.Enums.Icon.Error
-                        });
-                    var dresult = await dbox.ShowAsPopupAsync(this);
-                    return;
-                }
+                //if(OrderState.CurrentOrder.Count() < 1)
+                //{
+                //    var dbox = MessageBoxManager.GetMessageBoxStandard(
+                //        new MessageBoxStandardParams
+                //        {
+                //            ContentHeader = "No Pending Orders",
+                //            ContentMessage = "You don’t have any orders in progress. Please create or select an order before continuing.",
+                //            ButtonDefinitions = ButtonEnum.Ok, // Defines the available buttons
+                //            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                //            CanResize = false,
+                //            SizeToContent = SizeToContent.WidthAndHeight,
+                //            Width = 400,
+                //            ShowInCenter = true,
+                //            Icon = MsBox.Avalonia.Enums.Icon.Error
+                //        });
+                //    var dresult = await dbox.ShowAsPopupAsync(this);
+                //    return;
+                //}
 
                 // Perform actions based on the orderType
                 switch (orderType)
