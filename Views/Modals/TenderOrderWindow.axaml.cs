@@ -286,7 +286,7 @@ namespace EBISX_POS.Views
 
                             if (success)
                             {
-                                var promoWindow = new DiscountCodeWindow("PROMO");
+                                var promoWindow = new DiscountCodeWindow("PROMO", email);
                                 await promoWindow.ShowDialog((Window)this.VisualRoot);
                             }
 
@@ -316,7 +316,7 @@ namespace EBISX_POS.Views
 
                             if (success)
                             {
-                                var promoWindow = new DiscountCodeWindow("COUPON");
+                                var promoWindow = new DiscountCodeWindow("COUPON", email);
                                 await promoWindow.ShowDialog((Window)this.VisualRoot);
                             }
 

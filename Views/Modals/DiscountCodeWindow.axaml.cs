@@ -20,11 +20,13 @@ namespace EBISX_POS.Views
     {
         // DiscountType should be "PROMO" or "COUPON"
         public string DiscountType { get; }
+        public string ManagerEmail { get; }
 
-        public DiscountCodeWindow(string discountType)
+        public DiscountCodeWindow(string discountType, string managerEmail)
         {
             InitializeComponent();
             DiscountType = discountType?.ToUpperInvariant() ?? "PROMO"; // default to PROMO if null
+            ManagerEmail = managerEmail;
             CodeTextBox = this.FindControl<TextBox>("CodeTextBox");
             CodeTextBox.Watermark = DiscountType == "PROMO" ? "Enter Promo Code" :
                                     DiscountType == "COUPON" ? "Enter Coupon Code" :
@@ -65,26 +67,18 @@ namespace EBISX_POS.Views
             var orderService = App.Current.Services.GetRequiredService<OrderService>();
             var trimmedCode = CodeTextBox.Text.Trim();
 
-            var swipeManager = new ManagerSwipeWindow(header: "Manager Authorization", message: "Please enter manager email.", ButtonName: "Submit");
-            var (success, email) = await swipeManager.ShowDialogAsync(this);
-            if (!success)
-            {
-                Close();
-                return;
-            }
-
 
             (bool isSuccess, string message) result;
             // Decide which service method to call based on the discount type.
             if (DiscountType == "PROMO")
             {
                 // For demo purposes, using a placeholder manager email.
-                result = await orderService.PromoDiscount(managerEmail: email, promoCode: trimmedCode);
+                result = await orderService.PromoDiscount(managerEmail: ManagerEmail, promoCode: trimmedCode);
             }
             else if (DiscountType == "COUPON")
             {
                 // For coupon, assume we use the AvailCoupon method.
-                result = await orderService.AvailCoupon(managerEmail: email, couponCode: trimmedCode);
+                result = await orderService.AvailCoupon(managerEmail: ManagerEmail, couponCode: trimmedCode);
             }
             else
             {
@@ -117,6 +111,7 @@ namespace EBISX_POS.Views
                 if (decimal.TryParse(result.message, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal discountAmount))
                 {
                     TenderState.tenderOrder.PromoDiscountAmount = discountAmount;
+                    TenderState.tenderOrder.PromoDiscountName = trimmedCode;
                 }
                 else
                 {

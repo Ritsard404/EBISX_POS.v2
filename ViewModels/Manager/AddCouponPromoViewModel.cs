@@ -225,6 +225,14 @@ namespace EBISX_POS.ViewModels.Manager
                 return false;
             }
 
+            if (!string.IsNullOrWhiteSpace(PromoCode) && (SelectedMenus.Count > 0 || CouponItemQuantity > 0))
+            {
+                ShowError(
+                    "A promo code cannot be applied when menu items or coupon items are already selected. " +
+                    "Please remove those items before using a promo code."
+                ); return false;
+            }
+
             if (!string.IsNullOrWhiteSpace(CouponCode) && SelectedMenus.Count == 0)
             {
                 ShowError("At least one menu item must be selected for a coupon.");
@@ -266,4 +274,4 @@ namespace EBISX_POS.ViewModels.Manager
             await successBox.ShowAsPopupAsync(_window);
         }
     }
-} 
+}

@@ -20,6 +20,7 @@ namespace EBISX_POS.Models
         [ObservableProperty] private int discountPercent = 0;
         [ObservableProperty] private decimal promoDiscountAmount = 0m;
         [ObservableProperty] private decimal promoDiscountPercent = 0m;
+        [ObservableProperty] private string promoDiscountName = string.Empty;
         [ObservableProperty] private decimal changeAmount = 0m;
         [ObservableProperty] private decimal amountDue = 0m;
 
@@ -59,6 +60,7 @@ namespace EBISX_POS.Models
             TotalAmount = TenderAmount = CashTenderAmount = DiscountAmount = PromoDiscountAmount = PromoDiscountPercent = 0m;
             HasPromoDiscount = HasScDiscount = HasPwdDiscount = HasOrderDiscount = false;
             OtherPayments = null;
+            PromoDiscountName = string.Empty;
             UpdateComputedValues();
         }
 

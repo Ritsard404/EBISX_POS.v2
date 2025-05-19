@@ -312,7 +312,11 @@ namespace EBISX_POS.Util
             writer.WriteLine(CenterText($"{"Total Amount:",-20}{TenderState.tenderOrder.TotalAmount.ToString("C", PesoCulture),20}"));
             if (TenderState.tenderOrder.HasOrderDiscount)
             {
-                writer.WriteLine(CenterText($"{"Discount Amount:",-20}{TenderState.tenderOrder.DiscountAmount.ToString("C", PesoCulture),20}"));
+                string discountLabel = TenderState.tenderOrder.PromoDiscountAmount > 0m
+                ? $"Discount Amount ({TenderState.tenderOrder.PromoDiscountName}):"
+                : "Discount Amount:";
+
+                writer.WriteLine(CenterText($"{discountLabel,-20}{TenderState.tenderOrder.DiscountAmount.ToString("C", PesoCulture),20}"));
             }
             writer.WriteLine(CenterText($"{"Due Amount:",-20}{TenderState.tenderOrder.AmountDue.ToString("C", PesoCulture),20}"));
 
