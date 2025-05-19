@@ -65,17 +65,26 @@ namespace EBISX_POS.Views
             var orderService = App.Current.Services.GetRequiredService<OrderService>();
             var trimmedCode = CodeTextBox.Text.Trim();
 
+            var swipeManager = new ManagerSwipeWindow(header: "Manager Authorization", message: "Please enter manager email.", ButtonName: "Submit");
+            var (success, email) = await swipeManager.ShowDialogAsync(this);
+            if (!success)
+            {
+                Close();
+                return;
+            }
+
+
             (bool isSuccess, string message) result;
             // Decide which service method to call based on the discount type.
             if (DiscountType == "PROMO")
             {
                 // For demo purposes, using a placeholder manager email.
-                result = await orderService.PromoDiscount(managerEmail: CashierState.ManagerEmail, promoCode: trimmedCode);
+                result = await orderService.PromoDiscount(managerEmail: email, promoCode: trimmedCode);
             }
             else if (DiscountType == "COUPON")
             {
                 // For coupon, assume we use the AvailCoupon method.
-                result = await orderService.AvailCoupon(managerEmail: CashierState.ManagerEmail, couponCode: trimmedCode);
+                result = await orderService.AvailCoupon(managerEmail: email, couponCode: trimmedCode);
             }
             else
             {
