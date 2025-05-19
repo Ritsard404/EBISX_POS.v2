@@ -14,6 +14,7 @@ using EBISX_POS.Services;
 using EBISX_POS.Util;
 using EBISX_POS.API.Models;
 using EBISX_POS.Services.DTO.Report;
+using EBISX_POS.Helper;
 
 namespace EBISX_POS.Views.Manager
 {

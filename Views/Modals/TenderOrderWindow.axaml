@@ -76,7 +76,7 @@
 								<TextBlock Grid.Column="1"
 										   VerticalAlignment="Center"
 										   HorizontalAlignment="Left"
-										   Text=" (PROMO)"
+										   Text=" (COUPON)"
 										   FontFamily="{StaticResource NunitoFont}"
 										   FontSize="18"
 										   IsVisible="{Binding TenderCurrentOrder.HasCouponDiscount}"

@@ -21,6 +21,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia;
 using Avalonia.Interactivity;
 using EBISX_POS.v2.Views;
+using EBISX_POS.Helper;
 
 namespace EBISX_POS.Views
 {
@@ -107,12 +108,6 @@ namespace EBISX_POS.Views
 
         private async void Cash_Track_Button(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            //var cashTrack = _serviceProvider?.GetRequiredService<CashTrackView>();
-            //if (cashTrack != null)
-            //{
-            //    cashTrack.GenerateCashTrack(sender, e);
-            //}
-
 
             ShowLoader(true);
             var reportService = App.Current.Services.GetRequiredService<ReportService>();
@@ -138,9 +133,22 @@ namespace EBISX_POS.Views
                 ";
 
             reportContent = string.Join("\n", reportContent.Split("\n").Select(line => line.Trim()));
-            File.WriteAllText(filePath, reportContent);
+            //File.WriteAllText(filePath, reportContent);
 
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+
+            string cashierEmail = CashierState.CashierEmail;
+            string thermalPrinter = "POS";   // the exact name of your 58 mm printer
+            string archiveFolder = _cashTrackReportPath; // or null/"" if you don’t need archiving
+
+            CashTrackPrinter.PrintCashTrackReport(
+                cashierEmail,
+                CashInDrawer,
+                CurrentCashDrawer,
+                thermalPrinter,
+                archiveFolder
+            );
+
             ShowLoader(false);
         }
 

@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using EBISX_POS.Util;
 using Microsoft.Extensions.Options;
 using EBISX_POS.API.Services.DTO.Payment;
+using EBISX_POS.Helper;
 
 namespace EBISX_POS.Views
 {

@@ -1,5 +1,6 @@
 ﻿using EBISX_POS.API.Services.DTO.Order;
 using EBISX_POS.API.Services.DTO.Report;
+using EBISX_POS.Helper;
 using EBISX_POS.Services;
 using EBISX_POS.Services.DTO.Report;
 using EBISX_POS.State;
@@ -11,19 +12,29 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace EBISX_POS.Util
 {
     public static class ReceiptPrinterUtil
     {
-        private const int ReceiptWidth = 50;
+        private const int ReceiptWidth = 32;
+        private const int QtyWidth = 3;
+        private const int DescWidth = 20;
+        private const int AmountWidth = 9;
         private static readonly CultureInfo PesoCulture = new CultureInfo("en-PH");
+        private const string PrinterName = "POS"; // Your thermal printer name
 
         private static string CenterText(string text) =>
             text.PadLeft((ReceiptWidth + text.Length) / 2).PadRight(ReceiptWidth);
 
         private static string AlignText(string left, string right) =>
             left.PadRight(ReceiptWidth - (right ?? "0").Length) + (right ?? "0");
+
+        private static string FormatItemLine(string qty, string desc, string amount)
+        {
+            return $"{qty.PadRight(QtyWidth)}{desc.PadRight(DescWidth)}{amount.PadLeft(AmountWidth)}";
+        }
 
         private static void EnsureDirectoryExists(string path)
         {
@@ -36,6 +47,13 @@ namespace EBISX_POS.Util
             {
                 Directory.CreateDirectory(path);
             }
+        }
+
+        private static void PrintToPrinter(StringBuilder content)
+        {
+            // Add line feeds for paper cutting
+            content.AppendLine("\n\n\n");
+            RawPrinterHelper.PrintText(PrinterName, content.ToString());
         }
 
         public static async void PrintXReading(IServiceProvider serviceProvider)
@@ -51,81 +69,87 @@ namespace EBISX_POS.Util
             string fileName = $"XInvoice-{DateTime.UtcNow.ToString("MMMM-dd-yyyy-HH-mm-ss")}.txt";
             var filePath = Path.Combine(reportPath, fileName);
 
-            using var writer = new StreamWriter(filePath);
+            var content = new StringBuilder();
 
             // Header
-            writer.WriteLine(CenterText(rpt.BusinessName));
-            writer.WriteLine(CenterText($"Operated by: {rpt.OperatorName}"));
-            writer.WriteLine();
-            writer.WriteLine(CenterText(rpt.AddressLine));
-            writer.WriteLine();
-            writer.WriteLine(CenterText($"VAT REG TIN: {rpt.VatRegTin}"));
-            writer.WriteLine(CenterText($"MIN: {rpt.Min}"));
-            writer.WriteLine(CenterText($"S/N: {rpt.SerialNumber}"));
-            writer.WriteLine();
+            content.AppendLine(CenterText(rpt.BusinessName));
+            content.AppendLine(CenterText($"Operated by: {rpt.OperatorName}"));
+            content.AppendLine();
+            content.AppendLine(CenterText(rpt.AddressLine));
+            content.AppendLine();
+            content.AppendLine(CenterText($"VAT REG TIN: {rpt.VatRegTin}"));
+            content.AppendLine(CenterText($"MIN: {rpt.Min}"));
+            content.AppendLine(CenterText($"S/N: {rpt.SerialNumber}"));
+            content.AppendLine();
 
             // Title
-            writer.WriteLine(CenterText("X-READING REPORT"));
-            writer.WriteLine();
+            content.AppendLine(CenterText("X-READING REPORT"));
+            content.AppendLine();
 
             // Report date/time
-            writer.WriteLine(AlignText("Report Date:", rpt.ReportDate));
-            writer.WriteLine(AlignText("Report Time:", rpt.ReportTime));
-            writer.WriteLine();
+            content.AppendLine(AlignText("Report Date:", rpt.ReportDate));
+            content.AppendLine(AlignText("Report Time:", rpt.ReportTime));
+            content.AppendLine();
 
             // Period
-            writer.WriteLine(AlignText("Start Date & Time:", rpt.StartDateTime));
-            writer.WriteLine(AlignText("End Date & Time:", rpt.EndDateTime));
-            writer.WriteLine();
+            content.AppendLine(AlignText("Start Date & Time:", rpt.StartDateTime));
+            content.AppendLine(AlignText("End Date & Time:", rpt.EndDateTime));
+            content.AppendLine();
 
             // Cashier & OR
-            writer.WriteLine(AlignText($"Cashier: {rpt.Cashier}",""));
-            writer.WriteLine();
-            writer.WriteLine(AlignText("Beg. OR #:", rpt.BeginningOrNumber));
-            writer.WriteLine(AlignText("End. OR #:", rpt.EndingOrNumber));
-            writer.WriteLine();
+            content.AppendLine(AlignText($"Cashier: {rpt.Cashier}", ""));
+            content.AppendLine();
+            content.AppendLine(AlignText("Beg. OR #:", rpt.BeginningOrNumber));
+            content.AppendLine(AlignText("End. OR #:", rpt.EndingOrNumber));
+            content.AppendLine();
 
             // Opening fund
-            writer.WriteLine(AlignText("Opening Fund:", rpt.OpeningFund));
-            writer.WriteLine(new string('=', ReceiptWidth));
+            content.AppendLine(AlignText("Opening Fund:", rpt.OpeningFund));
+            content.AppendLine(new string('=', ReceiptWidth));
 
             // Payments section
-            writer.WriteLine(CenterText("PAYMENTS RECEIVED"));
-            writer.WriteLine();
-            writer.WriteLine(AlignText("CASH", rpt.Payments.CashString));
+            content.AppendLine(CenterText("PAYMENTS RECEIVED"));
+            content.AppendLine();
+            content.AppendLine(AlignText("CASH", rpt.Payments.CashString));
             if (rpt.Payments.OtherPayments != null)
             {
                 foreach (var p in rpt.Payments.OtherPayments)
                 {
-                    writer.WriteLine(AlignText(p.Name.ToUpper(), p.AmountString));
+                    content.AppendLine(AlignText(p.Name.ToUpper(), p.AmountString));
                 }
             }
-            writer.WriteLine(AlignText("Total Payments:", rpt.Payments.Total));
-            writer.WriteLine(new string('=', ReceiptWidth));
+            content.AppendLine(AlignText("Total Payments:", rpt.Payments.Total));
+            content.AppendLine(new string('=', ReceiptWidth));
 
             // Void / Refund / Withdrawal
-            writer.WriteLine(AlignText("VOID", rpt.VoidAmount));
-            writer.WriteLine(new string('=', ReceiptWidth));
-            writer.WriteLine(AlignText("REFUND", rpt.Refund));
-            writer.WriteLine(new string('=', ReceiptWidth));
-            writer.WriteLine(AlignText("WITHDRAWAL", rpt.Withdrawal));
-            writer.WriteLine(new string('=', ReceiptWidth));
+            content.AppendLine(AlignText("VOID", rpt.VoidAmount));
+            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(AlignText("REFUND", rpt.Refund));
+            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(AlignText("WITHDRAWAL", rpt.Withdrawal));
+            content.AppendLine(new string('=', ReceiptWidth));
 
             // Transaction summary
-            writer.WriteLine(CenterText("TRANSACTION SUMMARY"));
-            writer.WriteLine();
-            writer.WriteLine(AlignText("Cash In Drawer:", rpt.TransactionSummary.CashInDrawer));
+            content.AppendLine(CenterText("TRANSACTION SUMMARY"));
+            content.AppendLine();
+            content.AppendLine(AlignText("Cash In Drawer:", rpt.TransactionSummary.CashInDrawer));
             foreach (var p in rpt.TransactionSummary.OtherPayments)
             {
-                writer.WriteLine(AlignText(p.Name.ToUpper(), p.AmountString));
+                content.AppendLine(AlignText(p.Name.ToUpper(), p.AmountString));
             }
-            writer.WriteLine(new string('=', ReceiptWidth));
+            content.AppendLine(new string('=', ReceiptWidth));
 
             // Short/Over
-            writer.WriteLine(AlignText("SHORT/OVER:", rpt.ShortOver));
-            writer.WriteLine();
+            content.AppendLine(AlignText("SHORT/OVER:", rpt.ShortOver));
+            content.AppendLine();
 
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            // Save to file
+            File.WriteAllText(filePath, content.ToString());
+
+            // Print to thermal printer
+            PrintToPrinter(content);
+
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
 
         public static async void PrintZReading(IServiceProvider serviceProvider)
@@ -133,7 +157,7 @@ namespace EBISX_POS.Util
             var reportOptions = serviceProvider.GetRequiredService<IOptions<SalesReport>>();
             var reportService = serviceProvider.GetRequiredService<ReportService>();
 
-            var rpt = await reportService.ZInvoiceReport(); // You should implement this accordingly
+            var rpt = await reportService.ZInvoiceReport();
             var reportPath = reportOptions.Value.ZInvoiceReport;
 
             EnsureDirectoryExists(reportPath);
@@ -141,106 +165,112 @@ namespace EBISX_POS.Util
             string fileName = $"ZInvoice-{DateTimeOffset.UtcNow:MMMM-dd-yyyy-HH-mm-ss}.txt";
             var filePath = Path.Combine(reportPath, fileName);
 
-            using var writer = new StreamWriter(filePath);
+            var content = new StringBuilder();
 
             // Header
-            writer.WriteLine(CenterText(rpt.BusinessName));
-            writer.WriteLine(CenterText($"Operated by: {rpt.OperatorName}"));
-            writer.WriteLine(CenterText(rpt.AddressLine));
-            writer.WriteLine(CenterText($"VAT REG TIN: {rpt.VatRegTin}"));
-            writer.WriteLine(CenterText($"MIN: {rpt.Min}"));
-            writer.WriteLine(CenterText($"S/N: {rpt.SerialNumber}"));
-            writer.WriteLine();
+            content.AppendLine(CenterText(rpt.BusinessName));
+            content.AppendLine(CenterText($"Operated by: {rpt.OperatorName}"));
+            content.AppendLine(CenterText(rpt.AddressLine));
+            content.AppendLine(CenterText($"VAT REG TIN: {rpt.VatRegTin}"));
+            content.AppendLine(CenterText($"MIN: {rpt.Min}"));
+            content.AppendLine(CenterText($"S/N: {rpt.SerialNumber}"));
+            content.AppendLine();
 
             // Title
-            writer.WriteLine(CenterText("Z-READING REPORT"));
-            writer.WriteLine();
+            content.AppendLine(CenterText("Z-READING REPORT"));
+            content.AppendLine();
 
             // Report date/time
-            writer.WriteLine(AlignText("Report Date:", rpt.ReportDate));
-            writer.WriteLine(AlignText("Report Time:", rpt.ReportTime));
-            writer.WriteLine();
+            content.AppendLine(AlignText("Report Date:", rpt.ReportDate));
+            content.AppendLine(AlignText("Report Time:", rpt.ReportTime));
+            content.AppendLine();
 
             // Period
-            writer.WriteLine(AlignText("Start Date & Time:", rpt.StartDateTime));
-            writer.WriteLine(AlignText("End Date & Time:", rpt.EndDateTime));
-            writer.WriteLine();
+            content.AppendLine(AlignText("Start Date & Time:", rpt.StartDateTime));
+            content.AppendLine(AlignText("End Date & Time:", rpt.EndDateTime));
+            content.AppendLine();
 
             // SI/VOID/RETURN numbers
-            writer.WriteLine(AlignText("Beg. SI #:", rpt.BeginningSI));
-            writer.WriteLine(AlignText("End. SI #:", rpt.EndingSI));
-            writer.WriteLine(AlignText("Beg. VOID #:", rpt.BeginningVoid));
-            writer.WriteLine(AlignText("End. VOID #:", rpt.EndingVoid));
-            writer.WriteLine(AlignText("Beg. RETURN #:", rpt.BeginningReturn));
-            writer.WriteLine(AlignText("End. RETURN #:", rpt.EndingReturn));
-            writer.WriteLine();
+            content.AppendLine(AlignText("Beg. SI #:", rpt.BeginningSI));
+            content.AppendLine(AlignText("End. SI #:", rpt.EndingSI));
+            content.AppendLine(AlignText("Beg. VOID #:", rpt.BeginningVoid));
+            content.AppendLine(AlignText("End. VOID #:", rpt.EndingVoid));
+            content.AppendLine(AlignText("Beg. RETURN #:", rpt.BeginningReturn));
+            content.AppendLine(AlignText("End. RETURN #:", rpt.EndingReturn));
+            content.AppendLine();
 
-            writer.WriteLine(AlignText("Reset Counter No.:", rpt.ResetCounter));
-            writer.WriteLine(AlignText("Z Counter No.:", rpt.ZCounter));
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine(AlignText("Reset Counter No.:", rpt.ResetCounter));
+            content.AppendLine(AlignText("Z Counter No.:", rpt.ZCounter));
+            content.AppendLine(new string('-', ReceiptWidth));
 
             // Sales section
-            writer.WriteLine(AlignText("Present Accumulated Sales:", rpt.PresentAccumulatedSales));
-            writer.WriteLine(AlignText("Previous Accumulated Sales:", rpt.PreviousAccumulatedSales));
-            writer.WriteLine(AlignText("Sales for the Day:", rpt.SalesForTheDay));
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine(AlignText("Present Accumulated Sales:", rpt.PresentAccumulatedSales));
+            content.AppendLine(AlignText("Previous Accumulated Sales:", rpt.PreviousAccumulatedSales));
+            content.AppendLine(AlignText("Sales for the Day:", rpt.SalesForTheDay));
+            content.AppendLine(new string('-', ReceiptWidth));
 
             // Breakdown of sales
-            writer.WriteLine(CenterText("BREAKDOWN OF SALES"));
-            writer.WriteLine();
-            writer.WriteLine(AlignText("VATABLE SALES:", rpt.SalesBreakdown.VatableSales));
-            writer.WriteLine(AlignText("VAT AMOUNT:", rpt.SalesBreakdown.VatAmount));
-            writer.WriteLine(AlignText("VAT EXEMPT SALES:", rpt.SalesBreakdown.VatExemptSales));
-            writer.WriteLine(AlignText("ZERO RATED SALES:", rpt.SalesBreakdown.ZeroRatedSales));
-            writer.WriteLine(new string('-', ReceiptWidth));
-            writer.WriteLine(AlignText("Gross Amount:", rpt.SalesBreakdown.GrossAmount));
-            writer.WriteLine(AlignText("Less Discount:", rpt.SalesBreakdown.LessDiscount));
-            writer.WriteLine(AlignText("Less Return:", rpt.SalesBreakdown.LessReturn));
-            writer.WriteLine(AlignText("Less Void:", rpt.SalesBreakdown.LessVoid));
-            writer.WriteLine(AlignText("Less VAT Adjustment:", rpt.SalesBreakdown.LessVatAdjustment));
-            writer.WriteLine(AlignText("Net Amount:", rpt.SalesBreakdown.NetAmount));
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine(CenterText("BREAKDOWN OF SALES"));
+            content.AppendLine();
+            content.AppendLine(AlignText("VATABLE SALES:", rpt.SalesBreakdown.VatableSales));
+            content.AppendLine(AlignText("VAT AMOUNT:", rpt.SalesBreakdown.VatAmount));
+            content.AppendLine(AlignText("VAT EXEMPT SALES:", rpt.SalesBreakdown.VatExemptSales));
+            content.AppendLine(AlignText("ZERO RATED SALES:", rpt.SalesBreakdown.ZeroRatedSales));
+            content.AppendLine(new string('-', ReceiptWidth));
+            content.AppendLine(AlignText("Gross Amount:", rpt.SalesBreakdown.GrossAmount));
+            content.AppendLine(AlignText("Less Discount:", rpt.SalesBreakdown.LessDiscount));
+            content.AppendLine(AlignText("Less Return:", rpt.SalesBreakdown.LessReturn));
+            content.AppendLine(AlignText("Less Void:", rpt.SalesBreakdown.LessVoid));
+            content.AppendLine(AlignText("Less VAT Adjustment:", rpt.SalesBreakdown.LessVatAdjustment));
+            content.AppendLine(AlignText("Net Amount:", rpt.SalesBreakdown.NetAmount));
+            content.AppendLine(new string('-', ReceiptWidth));
 
             // Discounts
-            writer.WriteLine(CenterText("DISCOUNT SUMMARY"));
-            writer.WriteLine(AlignText("SC Disc. :", rpt.DiscountSummary.SeniorCitizen));
-            writer.WriteLine(AlignText("PWD Disc. :", rpt.DiscountSummary.Pwd));
-            writer.WriteLine(AlignText("Other Disc. :", rpt.DiscountSummary.Other));
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine(CenterText("DISCOUNT SUMMARY"));
+            content.AppendLine(AlignText("SC Disc. :", rpt.DiscountSummary.SeniorCitizen));
+            content.AppendLine(AlignText("PWD Disc. :", rpt.DiscountSummary.Pwd));
+            content.AppendLine(AlignText("Other Disc. :", rpt.DiscountSummary.Other));
+            content.AppendLine(new string('-', ReceiptWidth));
 
             // Adjustments
-            writer.WriteLine(CenterText("SALES ADJUSTMENT"));
-            writer.WriteLine(AlignText("VOID :", rpt.SalesAdjustment.Void));
-            writer.WriteLine(AlignText("RETURN :", rpt.SalesAdjustment.Return));
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine(CenterText("SALES ADJUSTMENT"));
+            content.AppendLine(AlignText("VOID :", rpt.SalesAdjustment.Void));
+            content.AppendLine(AlignText("RETURN :", rpt.SalesAdjustment.Return));
+            content.AppendLine(new string('-', ReceiptWidth));
 
-            writer.WriteLine(CenterText("VAT ADJUSTMENT"));
-            writer.WriteLine(AlignText("SC TRANS. :", rpt.VatAdjustment.ScTrans));
-            writer.WriteLine(AlignText("PWD TRANS :", rpt.VatAdjustment.PwdTrans));
-            writer.WriteLine(AlignText("REG.Disc. TRANS :", rpt.VatAdjustment.RegDiscTrans));
-            writer.WriteLine(AlignText("ZERO-RATED TRANS.:", rpt.VatAdjustment.ZeroRatedTrans));
-            writer.WriteLine(AlignText("VAT on Return:", rpt.VatAdjustment.VatOnReturn));
-            writer.WriteLine(AlignText("Other VAT Adjustments:", rpt.VatAdjustment.OtherAdjustments));
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine(CenterText("VAT ADJUSTMENT"));
+            content.AppendLine(AlignText("SC TRANS. :", rpt.VatAdjustment.ScTrans));
+            content.AppendLine(AlignText("PWD TRANS :", rpt.VatAdjustment.PwdTrans));
+            content.AppendLine(AlignText("REG.Disc. TRANS :", rpt.VatAdjustment.RegDiscTrans));
+            content.AppendLine(AlignText("ZERO-RATED TRANS.:", rpt.VatAdjustment.ZeroRatedTrans));
+            content.AppendLine(AlignText("VAT on Return:", rpt.VatAdjustment.VatOnReturn));
+            content.AppendLine(AlignText("Other VAT Adjustments:", rpt.VatAdjustment.OtherAdjustments));
+            content.AppendLine(new string('-', ReceiptWidth));
 
             // Transaction Summary
-            writer.WriteLine(CenterText("TRANSACTION SUMMARY"));
-            writer.WriteLine();
-            writer.WriteLine(AlignText("Cash In Drawer:", rpt.TransactionSummary.CashInDrawer));
+            content.AppendLine(CenterText("TRANSACTION SUMMARY"));
+            content.AppendLine();
+            content.AppendLine(AlignText("Cash In Drawer:", rpt.TransactionSummary.CashInDrawer));
             foreach (var p in rpt.TransactionSummary.OtherPayments)
             {
-                writer.WriteLine(AlignText(p.Name.ToUpper(), p.AmountString));
+                content.AppendLine(AlignText(p.Name.ToUpper(), p.AmountString));
             }
-            writer.WriteLine(AlignText("Opening Fund:", rpt.OpeningFund));
-            writer.WriteLine(AlignText("Less Withdrawal:", rpt.Withdrawal));
-            writer.WriteLine(AlignText("Payments Received:", rpt.PaymentsReceived));
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine(AlignText("Opening Fund:", rpt.OpeningFund));
+            content.AppendLine(AlignText("Less Withdrawal:", rpt.Withdrawal));
+            content.AppendLine(AlignText("Payments Received:", rpt.PaymentsReceived));
+            content.AppendLine(new string('-', ReceiptWidth));
 
             // Short/Over
-            writer.WriteLine(AlignText("SHORT/OVER:", rpt.ShortOver));
-            writer.WriteLine();
+            content.AppendLine(AlignText("SHORT/OVER:", rpt.ShortOver));
+            content.AppendLine();
 
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            // Save to file
+            File.WriteAllText(filePath, content.ToString());
+
+            // Print to thermal printer
+            PrintToPrinter(content);
+
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
 
         public static void PrintInvoice(string folderPath, string filePath, FinalizeOrderResponseDTO finalizeOrder)
@@ -257,95 +287,89 @@ namespace EBISX_POS.Util
 
             EnsureDirectoryExists(folderPath);
 
-            using var writer = new StreamWriter(filePath);
+            var content = new StringBuilder();
 
             // Header
-            writer.WriteLine(new string('=', ReceiptWidth));
-            writer.WriteLine(CenterText("Customer Invoice Receipt"));
-            writer.WriteLine(new string('=', ReceiptWidth));
-            writer.WriteLine(CenterText(finalizeOrder.RegisteredName));
-            writer.WriteLine(CenterText(finalizeOrder.Address));
-            writer.WriteLine(CenterText($"TIN: {finalizeOrder.VatTinNumber}"));
-            writer.WriteLine(CenterText($"MIN: {finalizeOrder.MinNumber}"));
-            writer.WriteLine(new string('-', ReceiptWidth));
-            writer.WriteLine();
+            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(CenterText("Customer Invoice"));
+            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(CenterText(finalizeOrder.RegisteredName));
+            content.AppendLine(CenterText(finalizeOrder.Address));
+            content.AppendLine(CenterText($"TIN: {finalizeOrder.VatTinNumber}"));
+            content.AppendLine(CenterText($"MIN: {finalizeOrder.MinNumber}"));
+            content.AppendLine(new string('-', ReceiptWidth));
+            content.AppendLine();
 
             // Invoice details
-            writer.WriteLine($"Invoice No: {finalizeOrder.InvoiceNumber}".PadRight(ReceiptWidth - 10));
-            writer.WriteLine(CenterText(TenderState.tenderOrder.OrderType));
-            writer.WriteLine($"Date: {finalizeOrder.InvoiceDate:d}".PadRight(ReceiptWidth - 10));
-            writer.WriteLine($"Cashier: {CashierState.CashierName}".PadRight(ReceiptWidth - 10));
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine($"INV: {finalizeOrder.InvoiceNumber}".PadRight(ReceiptWidth));
+            content.AppendLine(CenterText(TenderState.tenderOrder.OrderType));
+            content.AppendLine($"Date: {finalizeOrder.InvoiceDate:d}".PadRight(ReceiptWidth));
+            content.AppendLine($"Cashier: {CashierState.CashierName}".PadRight(ReceiptWidth));
+            content.AppendLine(new string('-', ReceiptWidth));
 
-            // Items header// Items header
-            writer.WriteLine($"{"Qty",-5} {"Description",-30} {"Amount",10}");
-            writer.WriteLine(new string('-', ReceiptWidth));
-            writer.WriteLine();
-
+            // Items header
+            content.AppendLine(FormatItemLine("Qty", "Description", "Amount"));
+            content.AppendLine(new string('-', ReceiptWidth));
+            content.AppendLine();
 
             // Invoice items
             foreach (var order in OrderState.CurrentOrder)
             {
                 foreach (var item in order.DisplaySubOrders)
                 {
-                    // Simulate the grid column widths.
-                    // Column 0: Fixed width (5 characters). Only show quantity if opacity is 1.
                     string quantityColumn = item.Opacity < 1.0
-                        ? new string(' ', 5)
-                        : $"{item.Quantity,-5}";
+                        ? new string(' ', QtyWidth)
+                        : $"{item.Quantity}";
 
-                    // Column 1: DisplayName in a left-aligned, fixed-width field (30 characters).
-                    string displayNameColumn = $"{item.DisplayName,-30}";
+                    string displayNameColumn = item.DisplayName.Length > DescWidth 
+                        ? item.DisplayName.Substring(0, DescWidth - 3) + "..."
+                        : item.DisplayName;
 
-                    // Column 2: Price string, right-aligned with 10 characters.
-                    string priceColumn = item.IsUpgradeMeal ? $"{item.ItemPriceString,10}" : string.Empty;
+                    string priceColumn = item.IsUpgradeMeal ? item.ItemPriceString : string.Empty;
 
-                    // Write out the formatted line simulating the grid.
-                    writer.WriteLine($"{quantityColumn}{displayNameColumn}{priceColumn}");
+                    content.AppendLine(FormatItemLine(quantityColumn, displayNameColumn, priceColumn));
                 }
-
-                writer.WriteLine();
+                content.AppendLine();
             }
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine(new string('-', ReceiptWidth));
 
             // Totals
-            writer.WriteLine(CenterText($"{"Total Amount:",-20}{TenderState.tenderOrder.TotalAmount.ToString("C", PesoCulture),20}"));
+            content.AppendLine(CenterText($"{"Total:",-15}{TenderState.tenderOrder.TotalAmount.ToString("C", PesoCulture),17}"));
             if (TenderState.tenderOrder.HasOrderDiscount)
             {
                 string discountLabel = TenderState.tenderOrder.PromoDiscountAmount > 0m
-                ? $"Discount Amount ({TenderState.tenderOrder.PromoDiscountName}):"
-                : "Discount Amount:";
+                    ? $"Disc ({TenderState.tenderOrder.PromoDiscountName}):"
+                    : "Discount:";
 
-                writer.WriteLine(CenterText($"{discountLabel,-20}{TenderState.tenderOrder.DiscountAmount.ToString("C", PesoCulture),20}"));
+                content.AppendLine(CenterText($"{discountLabel,-15}{TenderState.tenderOrder.DiscountAmount.ToString("C", PesoCulture),17}"));
             }
-            writer.WriteLine(CenterText($"{"Due Amount:",-20}{TenderState.tenderOrder.AmountDue.ToString("C", PesoCulture),20}"));
+            content.AppendLine(CenterText($"{"Due:",-15}{TenderState.tenderOrder.AmountDue.ToString("C", PesoCulture),17}"));
 
             if (TenderState.tenderOrder.HasOtherPayments && TenderState.tenderOrder.OtherPayments != null)
             {
                 foreach (var payment in TenderState.tenderOrder.OtherPayments)
                 {
-                    writer.WriteLine(CenterText($"{payment.SaleTypeName + ":",-20}{payment.Amount.ToString("C", PesoCulture),20}"));
+                    content.AppendLine(CenterText($"{payment.SaleTypeName + ":",-15}{payment.Amount.ToString("C", PesoCulture),17}"));
                 }
             }
-            writer.WriteLine(CenterText($"{"Cash Tendered:",-20}{TenderState.tenderOrder.CashTenderAmount.ToString("C", PesoCulture),20}"));
-            writer.WriteLine(CenterText($"{"Total Tendered:",-20}{TenderState.tenderOrder.TenderAmount.ToString("C", PesoCulture),20}"));
-            writer.WriteLine(CenterText($"{"Change:",-20}{TenderState.tenderOrder.ChangeAmount.ToString("C", PesoCulture),20}"));
-            writer.WriteLine();
+            content.AppendLine(CenterText($"{"Cash:",-15}{TenderState.tenderOrder.CashTenderAmount.ToString("C", PesoCulture),17}"));
+            content.AppendLine(CenterText($"{"Total:",-15}{TenderState.tenderOrder.TenderAmount.ToString("C", PesoCulture),17}"));
+            content.AppendLine(CenterText($"{"Change:",-15}{TenderState.tenderOrder.ChangeAmount.ToString("C", PesoCulture),17}"));
+            content.AppendLine();
 
-            writer.WriteLine(CenterText($"{"Vat Zero Sales:",-20}{0.ToString("C", PesoCulture),20}"));
-            writer.WriteLine(CenterText($"{"Vat Exempt Sales:",-20}{(TenderState.tenderOrder.VatExemptSales).ToString("C", PesoCulture),20}"));
-            writer.WriteLine(CenterText($"{"Vatables Sales:",-20}{(TenderState.tenderOrder.VatSales).ToString("C", PesoCulture),20}"));
-            writer.WriteLine(CenterText($"{"VAT Amount:",-20}{(TenderState.tenderOrder.VatAmount).ToString("C", PesoCulture),20}"));
-            writer.WriteLine();
+            content.AppendLine(CenterText($"{"VAT Zero:",-15}{0.ToString("C", PesoCulture),17}"));
+            content.AppendLine(CenterText($"{"VAT Exempt:",-15}{(TenderState.tenderOrder.VatExemptSales).ToString("C", PesoCulture),17}"));
+            content.AppendLine(CenterText($"{"VAT Sales:",-15}{(TenderState.tenderOrder.VatSales).ToString("C", PesoCulture),17}"));
+            content.AppendLine(CenterText($"{"VAT Amt:",-15}{(TenderState.tenderOrder.VatAmount).ToString("C", PesoCulture),17}"));
+            content.AppendLine();
 
             if (TenderState.ElligiblePWDSCDiscount == null || !TenderState.ElligiblePWDSCDiscount.Any())
             {
-                // Print the signature section once if no eligible discount state is available.
-                writer.WriteLine(CenterText("Name:____________________________"));
-                writer.WriteLine(CenterText("Address:_________________________"));
-                writer.WriteLine(CenterText("TIN: _____________________________"));
-                writer.WriteLine(CenterText("Signature: _______________________"));
-                writer.WriteLine();
+                content.AppendLine(CenterText("Name:_________________"));
+                content.AppendLine(CenterText("Address:______________"));
+                content.AppendLine(CenterText("TIN: _________________"));
+                content.AppendLine(CenterText("Signature: ___________"));
+                content.AppendLine();
             }
             else
             {
@@ -355,30 +379,33 @@ namespace EBISX_POS.Util
 
                 foreach (var pwdSc in names)
                 {
-                    // Build the centered name text.
-                    string nameText = $"Name: {pwdSc.ToUpper()}________";
-                    writer.WriteLine(nameText);
-                    // Create an underline using dashes; using the trimmed length of the nameText ensures a matching underline.
-                    writer.WriteLine("Address: ___________________________");
-                    writer.WriteLine("TIN: _____________________________");
-                    writer.WriteLine("Signature: _______________________");
-                    writer.WriteLine();
+                    string nameText = $"Name: {pwdSc.ToUpper()}____";
+                    content.AppendLine(nameText);
+                    content.AppendLine("Address: _____________");
+                    content.AppendLine("TIN: ________________");
+                    content.AppendLine("Signature: __________");
+                    content.AppendLine();
                 }
             }
 
-
             // Footer
-            writer.WriteLine(CenterText("This Serve as Sales Invoice"));
-            writer.WriteLine(CenterText("Arsene Software Solutions"));
-            writer.WriteLine(CenterText("Labangon St. Cebu City, Cebu"));
-            writer.WriteLine(CenterText($"VAT Reg TIN: {finalizeOrder.VatTinNumber}"));
-            writer.WriteLine(CenterText($"Date Issue: {finalizeOrder.DateIssued:d}"));
-            writer.WriteLine(CenterText($"Valid Until: {finalizeOrder.ValidUntil:d}"));
-            writer.WriteLine();
-            writer.WriteLine(new string('=', ReceiptWidth));
-            writer.WriteLine(CenterText("Thank you for your purchase!"));
-            writer.WriteLine(new string('=', ReceiptWidth));
-            writer.WriteLine();
+            content.AppendLine(CenterText("Sales Invoice"));
+            content.AppendLine(CenterText("Arsene Software"));
+            content.AppendLine(CenterText("Labangon, Cebu"));
+            content.AppendLine(CenterText($"TIN: {finalizeOrder.VatTinNumber}"));
+            content.AppendLine(CenterText($"Issued: {finalizeOrder.DateIssued:d}"));
+            content.AppendLine(CenterText($"Valid: {finalizeOrder.ValidUntil:d}"));
+            content.AppendLine();
+            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(CenterText("Thank you!"));
+            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine();
+
+            // Save to file
+            //File.WriteAllText(filePath, content.ToString());
+
+            // Print to thermal printer
+            PrintToPrinter(content);
         }
 
         public static void PrintSearchedInvoice(string folderPath, string filePath, InvoiceDetailsDTO invoice)
@@ -395,116 +422,114 @@ namespace EBISX_POS.Util
 
             EnsureDirectoryExists(folderPath);
 
-            using var writer = new StreamWriter(filePath);
+            var content = new StringBuilder();
 
             // Header
-            writer.WriteLine(new string('=', ReceiptWidth));
-            writer.WriteLine(CenterText("Customer Invoice Receipt"));
-            writer.WriteLine(new string('=', ReceiptWidth));
-            writer.WriteLine(CenterText(invoice.RegisteredName));
-            writer.WriteLine(CenterText(invoice.Address));
-            writer.WriteLine(CenterText($"TIN: {invoice.VatTinNumber}"));
-            writer.WriteLine(CenterText($"MIN: {invoice.MinNumber}"));
-            writer.WriteLine(new string('-', ReceiptWidth));
-            writer.WriteLine();
+            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(CenterText("Customer Invoice Receipt"));
+            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(CenterText(invoice.RegisteredName));
+            content.AppendLine(CenterText(invoice.Address));
+            content.AppendLine(CenterText($"TIN: {invoice.VatTinNumber}"));
+            content.AppendLine(CenterText($"MIN: {invoice.MinNumber}"));
+            content.AppendLine(new string('-', ReceiptWidth));
+            content.AppendLine();
 
             // Invoice details
-            writer.WriteLine($"Invoice No: {invoice.InvoiceNum}".PadRight(ReceiptWidth - 10));
-            writer.WriteLine(CenterText(invoice.OrderType));
-            writer.WriteLine($"Date: {invoice.InvoiceDate:d}".PadRight(ReceiptWidth - 10));
-            writer.WriteLine($"Cashier: {invoice.CashierName}".PadRight(ReceiptWidth - 10));
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine($"Invoice No: {invoice.InvoiceNum}".PadRight(ReceiptWidth - 10));
+            content.AppendLine(CenterText(invoice.OrderType));
+            content.AppendLine($"Date: {invoice.InvoiceDate:d}".PadRight(ReceiptWidth - 10));
+            content.AppendLine($"Cashier: {invoice.CashierName}".PadRight(ReceiptWidth - 10));
+            content.AppendLine(new string('-', ReceiptWidth));
 
             // Items header
-            writer.WriteLine($"{"Qty",-5} {"Description",-30} {"Amount",10}");
-            writer.WriteLine(new string('-', ReceiptWidth));
-            writer.WriteLine();
+            content.AppendLine($"{"Qty",-5} {"Description",-30} {"Amount",10}");
+            content.AppendLine(new string('-', ReceiptWidth));
+            content.AppendLine();
+
             // Invoice items
             foreach (var item in invoice.Items)
             {
                 foreach (var itemInfo in item.itemInfos)
                 {
-                    // Column 0: Fixed width (5 characters). Only show quantity if opacity is 1.
-
                     string quantityColumn = itemInfo.IsFirstItem
                         ? $"{item.Qty,-5}"
                         : new string(' ', 5);
-                    // Column 1: Description in a left-aligned, fixed-width field (30 characters).
                     string descriptionColumn = $"{itemInfo.Description,-30}";
-
-                    // Column 2: Amount, right-aligned with 10 characters.
                     string amountColumn = $"{itemInfo.Amount,10}";
 
-                    // Write out the formatted line simulating the grid.
-                    writer.WriteLine($"{quantityColumn}{descriptionColumn}{amountColumn}");
+                    content.AppendLine($"{quantityColumn}{descriptionColumn}{amountColumn}");
                 }
             }
-            writer.WriteLine(new string('-', ReceiptWidth));
+            content.AppendLine(new string('-', ReceiptWidth));
 
             // Totals
-            writer.WriteLine(CenterText($"{"Total Amount:",-20}{invoice.TotalAmount,20}"));
+            content.AppendLine(CenterText($"{"Total Amount:",-20}{invoice.TotalAmount,20}"));
             if (!string.IsNullOrEmpty(invoice.DiscountAmount))
             {
-                writer.WriteLine(CenterText($"{"Discount Amount:",-20}{invoice.DiscountAmount,20}"));
+                content.AppendLine(CenterText($"{"Discount Amount:",-20}{invoice.DiscountAmount,20}"));
             }
-            writer.WriteLine(CenterText($"{"Due Amount:",-20}{invoice.DueAmount,20}"));
+            content.AppendLine(CenterText($"{"Due Amount:",-20}{invoice.DueAmount,20}"));
 
             if (invoice.OtherPayments != null && invoice.OtherPayments.Any())
             {
                 foreach (var payment in invoice.OtherPayments)
                 {
-                    writer.WriteLine(CenterText($"{payment.SaleTypeName + ":",-20}{payment.Amount,20}"));
+                    content.AppendLine(CenterText($"{payment.SaleTypeName + ":",-20}{payment.Amount,20}"));
                 }
             }
-            writer.WriteLine(CenterText($"{"Cash Tendered:",-20}{invoice.CashTenderAmount,20}"));
-            writer.WriteLine(CenterText($"{"Total Tendered:",-20}{invoice.TotalTenderAmount,20}"));
-            writer.WriteLine(CenterText($"{"Change:",-20}{invoice.ChangeAmount,20}"));
-            writer.WriteLine();
+            content.AppendLine(CenterText($"{"Cash Tendered:",-20}{invoice.CashTenderAmount,20}"));
+            content.AppendLine(CenterText($"{"Total Tendered:",-20}{invoice.TotalTenderAmount,20}"));
+            content.AppendLine(CenterText($"{"Change:",-20}{invoice.ChangeAmount,20}"));
+            content.AppendLine();
 
-            writer.WriteLine(CenterText($"{"Vat Zero Sales:",-20}{0.ToString("C", PesoCulture),20}"));
-            writer.WriteLine(CenterText($"{"Vat Exempt Sales:",-20}{invoice.VatExemptSales,20}"));
-            writer.WriteLine(CenterText($"{"Vatables Sales:",-20}{invoice.VatSales,20}"));
-            writer.WriteLine(CenterText($"{"VAT Amount:",-20}{invoice.VatAmount,20}"));
-            writer.WriteLine();
+            content.AppendLine(CenterText($"{"Vat Zero Sales:",-20}{0.ToString("C", PesoCulture),20}"));
+            content.AppendLine(CenterText($"{"Vat Exempt Sales:",-20}{invoice.VatExemptSales,20}"));
+            content.AppendLine(CenterText($"{"Vatables Sales:",-20}{invoice.VatSales,20}"));
+            content.AppendLine(CenterText($"{"VAT Amount:",-20}{invoice.VatAmount,20}"));
+            content.AppendLine();
 
             if (invoice.ElligiblePeopleDiscounts == null || !invoice.ElligiblePeopleDiscounts.Any())
             {
-                // Print the signature section once if no eligible discount state is available.
-                writer.WriteLine(CenterText("Name:____________________________"));
-                writer.WriteLine(CenterText("Address:_________________________"));
-                writer.WriteLine(CenterText("TIN: _____________________________"));
-                writer.WriteLine(CenterText("Signature: _______________________"));
-                writer.WriteLine();
+                content.AppendLine(CenterText("Name:____________________________"));
+                content.AppendLine(CenterText("Address:_________________________"));
+                content.AppendLine(CenterText("TIN: _____________________________"));
+                content.AppendLine(CenterText("Signature: _______________________"));
+                content.AppendLine();
             }
             else
             {
                 foreach (var pwdSc in invoice.ElligiblePeopleDiscounts)
                 {
-                    // Build the centered name text.
                     string nameText = $"Name: {pwdSc.ToUpper()}________";
-                    writer.WriteLine(nameText);
-                    writer.WriteLine("Address: ___________________________");
-                    writer.WriteLine("TIN: _____________________________");
-                    writer.WriteLine("Signature: _______________________");
-                    writer.WriteLine();
+                    content.AppendLine(nameText);
+                    content.AppendLine("Address: ___________________________");
+                    content.AppendLine("TIN: _____________________________");
+                    content.AppendLine("Signature: _______________________");
+                    content.AppendLine();
                 }
             }
 
             // Footer
-            writer.WriteLine(CenterText("This Serve as Sales Invoice"));
-            writer.WriteLine(CenterText("Arsene Software Solutions"));
-            writer.WriteLine(CenterText("Labangon St. Cebu City, Cebu"));
-            writer.WriteLine(CenterText($"VAT Reg TIN: {invoice.VatTinNumber}"));
-            writer.WriteLine(CenterText($"Date Issue: {invoice.DateIssued:d}"));
-            writer.WriteLine(CenterText($"Valid Until: {invoice.ValidUntil:d}"));
-            writer.WriteLine();
-            writer.WriteLine(new string('=', ReceiptWidth));
-            writer.WriteLine(CenterText("Thank you for your purchase!"));
-            writer.WriteLine(new string('=', ReceiptWidth));
-            writer.WriteLine();
+            content.AppendLine(CenterText("This Serve as Sales Invoice"));
+            content.AppendLine(CenterText("Arsene Software Solutions"));
+            content.AppendLine(CenterText("Labangon St. Cebu City, Cebu"));
+            content.AppendLine(CenterText($"VAT Reg TIN: {invoice.VatTinNumber}"));
+            content.AppendLine(CenterText($"Date Issue: {invoice.DateIssued:d}"));
+            content.AppendLine(CenterText($"Valid Until: {invoice.ValidUntil:d}"));
+            content.AppendLine();
+            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(CenterText("Thank you for your purchase!"));
+            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine();
 
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            // Save to file
+            File.WriteAllText(filePath, content.ToString());
+
+            // Print to thermal printer
+            PrintToPrinter(content);
+
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
-
     }
 }

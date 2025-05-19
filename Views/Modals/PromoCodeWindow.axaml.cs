@@ -74,6 +74,7 @@ namespace EBISX_POS.Views
             if (decimal.TryParse(message, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal discountAmount))
             {
                 TenderState.tenderOrder.PromoDiscountAmount = discountAmount;
+                TenderState.tenderOrder.HasPromoDiscount = true;
                 TenderState.tenderOrder.CalculateTotalAmount();
 
             }
