@@ -144,7 +144,7 @@ namespace EBISX_POS.Util
             content.AppendLine();
 
             // Save to file
-            File.WriteAllText(filePath, content.ToString());
+            //File.WriteAllText(filePath, content.ToString());
 
             // Print to thermal printer
             PrintToPrinter(content);
@@ -265,7 +265,7 @@ namespace EBISX_POS.Util
             content.AppendLine();
 
             // Save to file
-            File.WriteAllText(filePath, content.ToString());
+            //File.WriteAllText(filePath, content.ToString());
 
             // Print to thermal printer
             PrintToPrinter(content);
@@ -524,7 +524,7 @@ namespace EBISX_POS.Util
             content.AppendLine();
 
             // Save to file
-            File.WriteAllText(filePath, content.ToString());
+            //File.WriteAllText(filePath, content.ToString());
 
             // Print to thermal printer
             PrintToPrinter(content);
