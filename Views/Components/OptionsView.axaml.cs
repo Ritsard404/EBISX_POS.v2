@@ -57,7 +57,7 @@ namespace EBISX_POS.Views
                 {
                     HandleSelection(ref _selectedAddOnButton, clickedButton, ref _selectedAddOn);
 
-                    OrderState.UpdateItemOrder(itemType: "AddOn", itemId: AddOn.MenuId, name: AddOn.MenuName, price: AddOn.Price, size: AddOn.Size, hasAddOn: false, hasDrink: false);
+                    OrderState.UpdateItemOrder(itemType: "Add-On", itemId: AddOn.MenuId, name: AddOn.MenuName, price: AddOn.Price, size: AddOn.Size, hasAddOn: false, hasDrink: false);
 
                     //Debug.WriteLine($"Selected AddOn: {AddOn.MenuName} Size: {AddOn.Size}");
                     //OrderState.DisplayOrders();
