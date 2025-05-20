@@ -291,7 +291,7 @@ namespace EBISX_POS.Util
 
             // Header
             content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText("Customer Invoice"));
+            content.AppendLine(CenterText("INVOICE"));
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine(CenterText(finalizeOrder.RegisteredName));
             content.AppendLine(CenterText(finalizeOrder.Address));
@@ -426,7 +426,7 @@ namespace EBISX_POS.Util
 
             // Header
             content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText("Customer Invoice Receipt"));
+            content.AppendLine(CenterText("INVOICE"));
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine(CenterText(invoice.RegisteredName));
             content.AppendLine(CenterText(invoice.Address));

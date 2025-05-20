@@ -231,7 +231,7 @@ namespace EBISX_POS.Services
         public async Task<DrinksDTO> GetDrinks(int menuId)
         {
             var apiDrinks = await _menu.Drinks(menuId);
-            
+
             // Map the API response to client DTOs
             var drinkTypesWithDrinks = apiDrinks.Item1.Select(drinkType => new EBISX_POS.Services.DTO.Menu.DrinkTypeDTO
             {
@@ -246,7 +246,9 @@ namespace EBISX_POS.Services
                         MenuName = drink.MenuName,
                         MenuPrice = drink.MenuPrice,
                         Size = drink.Size,
-                        MenuImagePath = drink.MenuImagePath
+                        MenuImagePath = drink.MenuImagePath,
+                        IsUpgradeMeal = drink.IsUpgradeMeal
+
                     }).ToList()
                 }).ToList()
             }).ToList();
