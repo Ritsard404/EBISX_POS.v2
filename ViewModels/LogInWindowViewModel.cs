@@ -290,8 +290,6 @@ namespace EBISX_POS.ViewModels
                     return;
                 }
 
-                var categories = await _menuService.GetCategoriesAsync();
-
                 var logInDTO = new LogInDTO
                 {
                     CashierEmail = SelectedCashier?.Email ?? "",
@@ -299,7 +297,6 @@ namespace EBISX_POS.ViewModels
                 };
 
                 var result = await _authService.LogInAsync(logInDTO);
-                Debug.WriteLine($"{result.success} {result.isManager} {result.name} {result.email} ");
                 if (!result.success)
                 {
                     ErrorMessage = result.name;
@@ -327,14 +324,6 @@ namespace EBISX_POS.ViewModels
 
                 if (result.isManager)
                 {
-                    if (categories == null || !categories.Any())
-                    {
-                        ErrorMessage = "No categories found.";
-                        OnPropertyChanged(nameof(HasError));
-                        IsLoading = false;
-                        return;
-                    }
-
                     CashierState.ManagerEmail = result.email;
                     var managerWindow = new ManagerWindow();
                     if (Application.Current.ApplicationLifetime
@@ -348,6 +337,7 @@ namespace EBISX_POS.ViewModels
                     return;
                 }
 
+                var categories = await _menuService.GetCategoriesAsync();
                 // Validate terminal for non-manager logins
                 var (isValid, message) = await ebisxService.ValidateTerminalExpiration();
                 if (!isValid)
@@ -401,6 +391,7 @@ namespace EBISX_POS.ViewModels
                     IsLoading = false;
                     return;
                 }
+
                 NavigateToMainWindow(cashierEmail: result.email, cashierName: result.name, owner);
             }
             catch (Exception ex)
