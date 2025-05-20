@@ -179,6 +179,8 @@ namespace EBISX_POS.Services
                             HasSize = !string.IsNullOrEmpty(a.Size),
                             Price = a.Price ?? 0m,
                             MenuImagePath = a.MenuImagePath,
+                            IsUpgradeMeal= a.IsUpgradeMeal,
+
                             // The client property IsUpgradeMeal is computed automatically
                         })
                         .ToList()
