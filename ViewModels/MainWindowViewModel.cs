@@ -53,7 +53,8 @@ namespace EBISX_POS.ViewModels
             ButtonList.Clear();
             categories.ForEach(category => ButtonList.Add(category));
 
-            await LoadMenusAsync(categories.FirstOrDefault().Id);
+            int categoryId = categories?.Select(c => c.Id).FirstOrDefault() ?? 0;
+            await LoadMenusAsync(categoryId);
 
         }
         private async Task LoadPendingOrder()

@@ -21,7 +21,7 @@
 					VerticalAlignment="Center"
 					FontSize="20"
 					FontWeight="Bold"
-					Text="User Logs"/>
+					Text="{Binding UserLogName}"/>
 
 				<Button
 					Grid.Column="1"

@@ -25,6 +25,8 @@ namespace EBISX_POS.ViewModels.Manager
 
         [ObservableProperty]
         private bool isManagerLogs;
+        [ObservableProperty]
+        private string userLogName;
 
         [ObservableProperty]
         private bool isLoading = false;
@@ -53,6 +55,7 @@ namespace EBISX_POS.ViewModels.Manager
             PreviousPageCommand = new RelayCommand(GoToPreviousPage, CanGoToPreviousPage);
 
             IsManagerLogs = isManagerLogs;
+            UserLogName = isManagerLogs?"Manager":"Cashier";
 
             // Optionally fetch records for today as default
             _ = LoadLogsAsync(DateTime.Today, DateTime.Today);
