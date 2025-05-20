@@ -290,6 +290,15 @@ namespace EBISX_POS.ViewModels
                     return;
                 }
 
+                var categories = await _menuService.GetCategoriesAsync();
+                if(categories == null || !categories.Any())
+                {
+                    ErrorMessage = "No categories found.";
+                    OnPropertyChanged(nameof(HasError));
+                    IsLoading = false;
+                    return;
+                }
+
                 var logInDTO = new LogInDTO
                 {
                     CashierEmail = SelectedCashier?.Email ?? "",
