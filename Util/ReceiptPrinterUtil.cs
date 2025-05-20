@@ -92,8 +92,8 @@ namespace EBISX_POS.Util
             content.AppendLine();
 
             // Period
-            content.AppendLine(AlignText("Start Date & Time:", rpt.StartDateTime));
-            content.AppendLine(AlignText("End Date & Time:", rpt.EndDateTime));
+            content.AppendLine(AlignText("Start Date/Time:", rpt.StartDateTime));
+            content.AppendLine(AlignText("End Date/Time:", rpt.EndDateTime));
             content.AppendLine();
 
             // Cashier & OR
@@ -186,8 +186,8 @@ namespace EBISX_POS.Util
             content.AppendLine();
 
             // Period
-            content.AppendLine(AlignText("Start Date & Time:", rpt.StartDateTime));
-            content.AppendLine(AlignText("End Date & Time:", rpt.EndDateTime));
+            content.AppendLine(AlignText("Start Date/Time:", rpt.StartDateTime));
+            content.AppendLine(AlignText("End Date/Time:", rpt.EndDateTime));
             content.AppendLine();
 
             // SI/VOID/RETURN numbers
