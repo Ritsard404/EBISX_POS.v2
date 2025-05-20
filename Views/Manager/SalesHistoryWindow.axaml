@@ -87,10 +87,10 @@
 				<!-- Columns -->
 				<DataGrid.Columns>
 					<DataGridTextColumn Binding="{Binding InvoiceNumString}" Header="Invoice No." />
-					<DataGridTextColumn Width="200" Binding="{Binding Date}" Header="Date" />
-					<DataGridTextColumn Width="200" Binding="{Binding Time}" Header="Time" />
-					<DataGridTextColumn Width="200" Binding="{Binding CashierName}" Header="Cashier" />
-					<DataGridTextColumn Width="200" Binding="{Binding InvoiceStatus}" Header="Status" />
+					<DataGridTextColumn Binding="{Binding Date}" Header="Date" />
+					<DataGridTextColumn Binding="{Binding Time}" Header="Time" />
+					<DataGridTextColumn Binding="{Binding CashierName}" Header="Cashier" />
+					<DataGridTextColumn Binding="{Binding InvoiceStatus}" Header="Status" />
 
 					<!-- Action Button -->
 					<DataGridTemplateColumn Width="100" Header="Action">
