@@ -291,13 +291,6 @@ namespace EBISX_POS.ViewModels
                 }
 
                 var categories = await _menuService.GetCategoriesAsync();
-                if(categories == null || !categories.Any())
-                {
-                    ErrorMessage = "No categories found.";
-                    OnPropertyChanged(nameof(HasError));
-                    IsLoading = false;
-                    return;
-                }
 
                 var logInDTO = new LogInDTO
                 {
@@ -334,6 +327,14 @@ namespace EBISX_POS.ViewModels
 
                 if (result.isManager)
                 {
+                    if (categories == null || !categories.Any())
+                    {
+                        ErrorMessage = "No categories found.";
+                        OnPropertyChanged(nameof(HasError));
+                        IsLoading = false;
+                        return;
+                    }
+
                     CashierState.ManagerEmail = result.email;
                     var managerWindow = new ManagerWindow();
                     if (Application.Current.ApplicationLifetime
@@ -393,6 +394,13 @@ namespace EBISX_POS.ViewModels
                     await alertBox.ShowAsPopupAsync(owner);
                 }
 
+                if (categories == null || !categories.Any())
+                {
+                    ErrorMessage = "No categories found.";
+                    OnPropertyChanged(nameof(HasError));
+                    IsLoading = false;
+                    return;
+                }
                 NavigateToMainWindow(cashierEmail: result.email, cashierName: result.name, owner);
             }
             catch (Exception ex)
