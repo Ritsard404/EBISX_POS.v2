@@ -14,6 +14,7 @@ namespace EBISX_POS.Services.DTO.Report
         public string Time { get; set; } = string.Empty;
         public string CashierEmail { get; set; } = string.Empty;
         public string CashierName { get; set; } = string.Empty;
+        public string InvoiceStatus { get; set; } = string.Empty;
 
     }
 }

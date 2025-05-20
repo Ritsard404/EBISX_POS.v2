@@ -82,7 +82,8 @@ namespace EBISX_POS.Services
                     Date = x.Date,
                     Time = x.Time,
                     CashierEmail = x.CashierEmail,
-                    CashierName = x.CashierName
+                    CashierName = x.CashierName,
+                    InvoiceStatus = x.InvoiceStatus
                 }).ToList();
 
                 return result;
@@ -165,7 +166,7 @@ namespace EBISX_POS.Services
             try
             {
                 var apiResponse = await _report.ZInvoiceReport();
-                
+
                 // Map API DTO to client DTO
                 return new ZInvoiceDTO
                 {

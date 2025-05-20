@@ -64,7 +64,7 @@ namespace EBISX_POS.Views.Manager
                         string fileName = $"Receipt-{DateTimeOffset.UtcNow.ToString("MMMM-dd-yyyy-HH-mm-ss")}.txt";
                         string filePath = Path.Combine(folderPath, fileName);
 
-                        ReceiptPrinterUtil.PrintSearchedInvoice(folderPath, filePath, invoice);
+                        ReceiptPrinterUtil.PrintSearchedInvoice(folderPath, filePath, invoice, selectedInvoice.InvoiceStatus);
                         ShowLoader(false);
 
                     }

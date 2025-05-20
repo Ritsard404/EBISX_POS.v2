@@ -90,6 +90,7 @@
 					<DataGridTextColumn Width="200" Binding="{Binding Date}" Header="Date" />
 					<DataGridTextColumn Width="200" Binding="{Binding Time}" Header="Time" />
 					<DataGridTextColumn Width="200" Binding="{Binding CashierName}" Header="Cashier" />
+					<DataGridTextColumn Width="200" Binding="{Binding InvoiceStatus}" Header="Status" />
 
 					<!-- Action Button -->
 					<DataGridTemplateColumn Width="100" Header="Action">

@@ -321,7 +321,7 @@ namespace EBISX_POS.Util
                         ? new string(' ', QtyWidth)
                         : $"{item.Quantity}";
 
-                    string displayNameColumn = item.DisplayName.Length > DescWidth 
+                    string displayNameColumn = item.DisplayName.Length > DescWidth
                         ? item.DisplayName.Substring(0, DescWidth - 3) + "..."
                         : item.DisplayName;
 
@@ -408,7 +408,7 @@ namespace EBISX_POS.Util
             PrintToPrinter(content);
         }
 
-        public static void PrintSearchedInvoice(string folderPath, string filePath, InvoiceDetailsDTO invoice)
+        public static void PrintSearchedInvoice(string folderPath, string filePath, InvoiceDetailsDTO invoice, string status)
         {
             if (string.IsNullOrEmpty(folderPath))
             {
@@ -425,14 +425,17 @@ namespace EBISX_POS.Util
             var content = new StringBuilder();
 
             // Header
-            content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText("INVOICE"));
-            content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(new string('=', ReceiptWidth)); 
+
+            var invoiceTitle = "INVOICE" + (status != "Paid" ? $" {status}" : "");
+            content.AppendLine(CenterText(invoiceTitle));
+
+            content.AppendLine(new string ('=', ReceiptWidth));
             content.AppendLine(CenterText(invoice.RegisteredName));
             content.AppendLine(CenterText(invoice.Address));
             content.AppendLine(CenterText($"TIN: {invoice.VatTinNumber}"));
             content.AppendLine(CenterText($"MIN: {invoice.MinNumber}"));
-            content.AppendLine(new string('-', ReceiptWidth));
+            content.AppendLine(new string ('-', ReceiptWidth));
             content.AppendLine();
 
             // Invoice details
@@ -440,11 +443,11 @@ namespace EBISX_POS.Util
             content.AppendLine(CenterText(invoice.OrderType));
             content.AppendLine($"Date: {invoice.InvoiceDate:d}".PadRight(ReceiptWidth - 10));
             content.AppendLine($"Cashier: {invoice.CashierName}".PadRight(ReceiptWidth - 10));
-            content.AppendLine(new string('-', ReceiptWidth));
+            content.AppendLine(new string ('-', ReceiptWidth));
 
             // Items header
             content.AppendLine($"{"Qty",-5} {"Description",-30} {"Amount",10}");
-            content.AppendLine(new string('-', ReceiptWidth));
+            content.AppendLine(new string ('-', ReceiptWidth));
             content.AppendLine();
 
             // Invoice items
@@ -455,79 +458,79 @@ namespace EBISX_POS.Util
                     string quantityColumn = itemInfo.IsFirstItem
                         ? $"{item.Qty,-5}"
                         : new string(' ', 5);
-                    string descriptionColumn = $"{itemInfo.Description,-30}";
-                    string amountColumn = $"{itemInfo.Amount,10}";
+        string descriptionColumn = $"{itemInfo.Description,-30}";
+        string amountColumn = $"{itemInfo.Amount,10}";
 
-                    content.AppendLine($"{quantityColumn}{descriptionColumn}{amountColumn}");
+        content.AppendLine($"{quantityColumn}{descriptionColumn}{amountColumn}");
                 }
-            }
-            content.AppendLine(new string('-', ReceiptWidth));
+}
+content.AppendLine(new string('-', ReceiptWidth));
 
-            // Totals
-            content.AppendLine(CenterText($"{"Total Amount:",-20}{invoice.TotalAmount,20}"));
-            if (!string.IsNullOrEmpty(invoice.DiscountAmount))
-            {
-                content.AppendLine(CenterText($"{"Discount Amount:",-20}{invoice.DiscountAmount,20}"));
-            }
-            content.AppendLine(CenterText($"{"Due Amount:",-20}{invoice.DueAmount,20}"));
+// Totals
+content.AppendLine(CenterText($"{"Total Amount:",-20}{invoice.TotalAmount,20}"));
+if (!string.IsNullOrEmpty(invoice.DiscountAmount))
+{
+    content.AppendLine(CenterText($"{"Discount Amount:",-20}{invoice.DiscountAmount,20}"));
+}
+content.AppendLine(CenterText($"{"Due Amount:",-20}{invoice.DueAmount,20}"));
 
-            if (invoice.OtherPayments != null && invoice.OtherPayments.Any())
-            {
-                foreach (var payment in invoice.OtherPayments)
-                {
-                    content.AppendLine(CenterText($"{payment.SaleTypeName + ":",-20}{payment.Amount,20}"));
-                }
-            }
-            content.AppendLine(CenterText($"{"Cash Tendered:",-20}{invoice.CashTenderAmount,20}"));
-            content.AppendLine(CenterText($"{"Total Tendered:",-20}{invoice.TotalTenderAmount,20}"));
-            content.AppendLine(CenterText($"{"Change:",-20}{invoice.ChangeAmount,20}"));
-            content.AppendLine();
+if (invoice.OtherPayments != null && invoice.OtherPayments.Any())
+{
+    foreach (var payment in invoice.OtherPayments)
+    {
+        content.AppendLine(CenterText($"{payment.SaleTypeName + ":",-20}{payment.Amount,20}"));
+    }
+}
+content.AppendLine(CenterText($"{"Cash Tendered:",-20}{invoice.CashTenderAmount,20}"));
+content.AppendLine(CenterText($"{"Total Tendered:",-20}{invoice.TotalTenderAmount,20}"));
+content.AppendLine(CenterText($"{"Change:",-20}{invoice.ChangeAmount,20}"));
+content.AppendLine();
 
-            content.AppendLine(CenterText($"{"Vat Zero Sales:",-20}{0.ToString("C", PesoCulture),20}"));
-            content.AppendLine(CenterText($"{"Vat Exempt Sales:",-20}{invoice.VatExemptSales,20}"));
-            content.AppendLine(CenterText($"{"Vatables Sales:",-20}{invoice.VatSales,20}"));
-            content.AppendLine(CenterText($"{"VAT Amount:",-20}{invoice.VatAmount,20}"));
-            content.AppendLine();
+content.AppendLine(CenterText($"{"Vat Zero Sales:",-20}{0.ToString("C", PesoCulture),20}"));
+content.AppendLine(CenterText($"{"Vat Exempt Sales:",-20}{invoice.VatExemptSales,20}"));
+content.AppendLine(CenterText($"{"Vatables Sales:",-20}{invoice.VatSales,20}"));
+content.AppendLine(CenterText($"{"VAT Amount:",-20}{invoice.VatAmount,20}"));
+content.AppendLine();
 
-            if (invoice.ElligiblePeopleDiscounts == null || !invoice.ElligiblePeopleDiscounts.Any())
-            {
-                content.AppendLine(CenterText("Name:____________________________"));
-                content.AppendLine(CenterText("Address:_________________________"));
-                content.AppendLine(CenterText("TIN: _____________________________"));
-                content.AppendLine(CenterText("Signature: _______________________"));
-                content.AppendLine();
-            }
-            else
-            {
-                foreach (var pwdSc in invoice.ElligiblePeopleDiscounts)
-                {
-                    string nameText = $"Name: {pwdSc.ToUpper()}________";
-                    content.AppendLine(nameText);
-                    content.AppendLine("Address: ___________________________");
-                    content.AppendLine("TIN: _____________________________");
-                    content.AppendLine("Signature: _______________________");
-                    content.AppendLine();
-                }
-            }
+if (invoice.ElligiblePeopleDiscounts == null || !invoice.ElligiblePeopleDiscounts.Any())
+{
+    content.AppendLine(CenterText("Name:____________________________"));
+    content.AppendLine(CenterText("Address:_________________________"));
+    content.AppendLine(CenterText("TIN: _____________________________"));
+    content.AppendLine(CenterText("Signature: _______________________"));
+    content.AppendLine();
+}
+else
+{
+    foreach (var pwdSc in invoice.ElligiblePeopleDiscounts)
+    {
+        string nameText = $"Name: {pwdSc.ToUpper()}________";
+        content.AppendLine(nameText);
+        content.AppendLine("Address: ___________________________");
+        content.AppendLine("TIN: _____________________________");
+        content.AppendLine("Signature: _______________________");
+        content.AppendLine();
+    }
+}
 
-            // Footer
-            content.AppendLine(CenterText("This Serve as Sales Invoice"));
-            content.AppendLine(CenterText("Arsene Software Solutions"));
-            content.AppendLine(CenterText("Labangon St. Cebu City, Cebu"));
-            content.AppendLine(CenterText($"VAT Reg TIN: {invoice.VatTinNumber}"));
-            content.AppendLine(CenterText($"Date Issue: {invoice.DateIssued:d}"));
-            content.AppendLine(CenterText($"Valid Until: {invoice.ValidUntil:d}"));
-            content.AppendLine();
-            content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText("Thank you for your purchase!"));
-            content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine();
+// Footer
+content.AppendLine(CenterText("This Serve as Sales Invoice"));
+content.AppendLine(CenterText("Arsene Software Solutions"));
+content.AppendLine(CenterText("Labangon St. Cebu City, Cebu"));
+content.AppendLine(CenterText($"VAT Reg TIN: {invoice.VatTinNumber}"));
+content.AppendLine(CenterText($"Date Issue: {invoice.DateIssued:d}"));
+content.AppendLine(CenterText($"Valid Until: {invoice.ValidUntil:d}"));
+content.AppendLine();
+content.AppendLine(new string('=', ReceiptWidth));
+content.AppendLine(CenterText("Thank you for your purchase!"));
+content.AppendLine(new string('=', ReceiptWidth));
+content.AppendLine();
 
-            // Save to file
-            //File.WriteAllText(filePath, content.ToString());
+// Save to file
+//File.WriteAllText(filePath, content.ToString());
 
-            // Print to thermal printer
-            PrintToPrinter(content);
+// Print to thermal printer
+PrintToPrinter(content);
 
             //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
