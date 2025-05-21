@@ -464,7 +464,7 @@ namespace EBISX_POS.Util
 
             // Header
             content.AppendLine(new string('=', ReceiptWidth));
-            var invoiceTitle = "INV" + (status != "Paid" ? $" {status}" : "");
+            var invoiceTitle = "INVOICE" + (status != "Paid" ? $" {status}" : "");
             content.AppendLine(CenterText(invoiceTitle));
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine(CenterText(invoice.RegisteredName));
