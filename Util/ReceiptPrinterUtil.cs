@@ -464,10 +464,8 @@ namespace EBISX_POS.Util
 
             // Header
             content.AppendLine(new string('=', ReceiptWidth));
-
             var invoiceTitle = "INV" + (status != "Paid" ? $" {status}" : "");
             content.AppendLine(CenterText(invoiceTitle));
-
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine(CenterText(invoice.RegisteredName));
             content.AppendLine(CenterText(invoice.Address));
@@ -477,14 +475,14 @@ namespace EBISX_POS.Util
             content.AppendLine();
 
             // Invoice details
-            content.AppendLine($"Invoice No: {invoice.InvoiceNum}".PadRight(ReceiptWidth - 10));
+            content.AppendLine($"INV: {invoice.InvoiceNum}".PadRight(ReceiptWidth));
             content.AppendLine(CenterText(invoice.OrderType));
-            content.AppendLine($"Date: {invoice.InvoiceDate:d}".PadRight(ReceiptWidth - 10));
-            content.AppendLine($"Cashier: {invoice.CashierName}".PadRight(ReceiptWidth - 10));
+            content.AppendLine($"Date: {invoice.InvoiceDate:d}".PadRight(ReceiptWidth));
+            content.AppendLine($"Cashier: {invoice.CashierName}".PadRight(ReceiptWidth));
             content.AppendLine(new string('-', ReceiptWidth));
 
             // Items header
-            content.AppendLine($"{"Qty",-5} {"Description",-30} {"Amount",10}");
+            content.AppendLine(FormatItemLine("Qty", "Description", "Amount"));
             content.AppendLine(new string('-', ReceiptWidth));
             content.AppendLine();
 
@@ -493,84 +491,96 @@ namespace EBISX_POS.Util
             {
                 foreach (var itemInfo in item.itemInfos)
                 {
-                    string quantityColumn = itemInfo.IsFirstItem
-                        ? $"{item.Qty,-5}"
-                        : new string(' ', 5);
-                    string descriptionColumn = $"{itemInfo.Description,-30}";
-                    string amountColumn = $"{itemInfo.Amount,10}";
+                    string quantityColumn = itemInfo.IsFirstItem ? item.Qty.ToString() : "";
+                    string displayNameColumn = itemInfo.Description.Length > DescWidth
+                        ? itemInfo.Description.Substring(0, DescWidth - 3) + "..."
+                        : itemInfo.Description;
+                    string amountColumn = decimal.TryParse(itemInfo.Amount, out decimal amount) 
+                        ? amount.ToString("C", PesoCulture) 
+                        : itemInfo.Amount;
 
-                    content.AppendLine($"{quantityColumn}{descriptionColumn}{amountColumn}");
+                    content.AppendLine(FormatItemLine(quantityColumn, displayNameColumn, amountColumn));
                 }
+                content.AppendLine();
             }
             content.AppendLine(new string('-', ReceiptWidth));
 
             // Totals
-            content.AppendLine(CenterText($"{"Total Amount:",-20}{invoice.TotalAmount,20}"));
+            content.AppendLine(CenterText($"{"Total:",-15}{FormatCurrency(invoice.TotalAmount),17}"));
             if (!string.IsNullOrEmpty(invoice.DiscountAmount))
             {
-                content.AppendLine(CenterText($"{"Discount Amount:",-20}{invoice.DiscountAmount,20}"));
+                content.AppendLine(CenterText($"{"Discount:",-15}{invoice.DiscountAmount,17}"));
             }
-            content.AppendLine(CenterText($"{"Due Amount:",-20}{invoice.DueAmount,20}"));
+            content.AppendLine(CenterText($"{"Due:",-15}{FormatCurrency(invoice.DueAmount),17}"));
 
             if (invoice.OtherPayments != null && invoice.OtherPayments.Any())
             {
                 foreach (var payment in invoice.OtherPayments)
                 {
-                    content.AppendLine(CenterText($"{payment.SaleTypeName + ":",-20}{payment.Amount,20}"));
+                    content.AppendLine(CenterText($"{payment.SaleTypeName + ":",-15}{FormatCurrency(payment.Amount),17}"));
                 }
             }
-            content.AppendLine(CenterText($"{"Cash Tendered:",-20}{invoice.CashTenderAmount,20}"));
-            content.AppendLine(CenterText($"{"Total Tendered:",-20}{invoice.TotalTenderAmount,20}"));
-            content.AppendLine(CenterText($"{"Change:",-20}{invoice.ChangeAmount,20}"));
+            content.AppendLine(CenterText($"{"Cash:",-15}{FormatCurrency(invoice.CashTenderAmount),17}"));
+            content.AppendLine(CenterText($"{"Total:",-15}{FormatCurrency(invoice.TotalTenderAmount),17}"));
+            content.AppendLine(CenterText($"{"Change:",-15}{FormatCurrency(invoice.ChangeAmount),17}"));
             content.AppendLine();
 
-            content.AppendLine(CenterText($"{"Vat Zero Sales:",-20}{0.ToString("C", PesoCulture),20}"));
-            content.AppendLine(CenterText($"{"Vat Exempt Sales:",-20}{invoice.VatExemptSales,20}"));
-            content.AppendLine(CenterText($"{"Vatables Sales:",-20}{invoice.VatSales,20}"));
-            content.AppendLine(CenterText($"{"VAT Amount:",-20}{invoice.VatAmount,20}"));
+            content.AppendLine(CenterText($"{"VAT Zero:",-15}{0m.ToString("C", PesoCulture),17}"));
+            content.AppendLine(CenterText($"{"VAT Exempt:",-15}{FormatCurrency(invoice.VatExemptSales),17}"));
+            content.AppendLine(CenterText($"{"VAT Sales:",-15}{FormatCurrency(invoice.VatSales),17}"));
+            content.AppendLine(CenterText($"{"VAT Amt:",-15}{FormatCurrency(invoice.VatAmount),17}"));
             content.AppendLine();
 
             if (invoice.ElligiblePeopleDiscounts == null || !invoice.ElligiblePeopleDiscounts.Any())
             {
-                content.AppendLine(CenterText("Name:____________________________"));
-                content.AppendLine(CenterText("Address:_________________________"));
-                content.AppendLine(CenterText("TIN: _____________________________"));
-                content.AppendLine(CenterText("Signature: _______________________"));
+                content.AppendLine(CenterText("Name:_________________"));
+                content.AppendLine(CenterText("Address:______________"));
+                content.AppendLine(CenterText("TIN: _________________"));
+                content.AppendLine(CenterText("Signature: ___________"));
                 content.AppendLine();
             }
             else
             {
                 foreach (var pwdSc in invoice.ElligiblePeopleDiscounts)
                 {
-                    string nameText = $"Name: {pwdSc.ToUpper()}________";
-                    content.AppendLine(nameText);
-                    content.AppendLine("Address: ___________________________");
-                    content.AppendLine("TIN: _____________________________");
-                    content.AppendLine("Signature: _______________________");
+                    string nameText = $"Name: {pwdSc.ToUpper()}____";
+                    content.AppendLine(CenterText(nameText));
+                    content.AppendLine(CenterText("Address: _____________"));
+                    content.AppendLine(CenterText("TIN: ________________"));
+                    content.AppendLine(CenterText("Signature: __________"));
                     content.AppendLine();
                 }
             }
 
             // Footer
-            content.AppendLine(CenterText("This Serve as Sales Invoice"));
-            content.AppendLine(CenterText("Arsene Software Solutions"));
-            content.AppendLine(CenterText("Labangon St. Cebu City, Cebu"));
-            content.AppendLine(CenterText($"VAT Reg TIN: {invoice.VatTinNumber}"));
-            content.AppendLine(CenterText($"Date Issue: {invoice.DateIssued:d}"));
-            content.AppendLine(CenterText($"Valid Until: {invoice.ValidUntil:d}"));
+            content.AppendLine(CenterText("Sales Invoice"));
+            content.AppendLine(CenterText("Arsene Software"));
+            content.AppendLine(CenterText("Labangon, Cebu"));
+            content.AppendLine(CenterText($"TIN: {invoice.VatTinNumber}"));
+            content.AppendLine(CenterText($"Issued: {invoice.DateIssued:d}"));
+            content.AppendLine(CenterText($"Valid: {invoice.ValidUntil:d}"));
             content.AppendLine();
             content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText("Thank you for your purchase!"));
+            content.AppendLine(CenterText("Thank you!"));
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine();
-
-            // Save to file
-            //File.WriteAllText(filePath, content.ToString());
 
             // Print to thermal printer
             PrintToPrinter(content);
+        }
 
-            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+        private static string FormatCurrency(string value)
+        {
+            if (decimal.TryParse(value, out decimal amount))
+            {
+                return amount.ToString("C", PesoCulture);
+            }
+            return value;
+        }
+
+        private static string FormatCurrency(decimal? value)
+        {
+            return value?.ToString("C", PesoCulture) ?? "0.00";
         }
     }
 }
