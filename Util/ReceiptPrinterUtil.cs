@@ -204,8 +204,8 @@ namespace EBISX_POS.Util
             content.AppendLine(new string('-', ReceiptWidth));
 
             // Sales section
-            content.AppendLine(AlignText("Present Accumulated Sales:", rpt.PresentAccumulatedSales));
-            content.AppendLine(AlignText("Previous Accumulated Sales:", rpt.PreviousAccumulatedSales));
+            content.AppendLine(AlignText("Accum. Sales:", rpt.PresentAccumulatedSales));
+            content.AppendLine(AlignText("Prev. Accum. Sales:", rpt.PreviousAccumulatedSales));
             content.AppendLine(AlignText("Sales for the Day:", rpt.SalesForTheDay));
             content.AppendLine(new string('-', ReceiptWidth));
 
@@ -427,7 +427,7 @@ namespace EBISX_POS.Util
             // Header
             content.AppendLine(new string('=', ReceiptWidth));
 
-            var invoiceTitle = "INVOICE" + (status != "Paid" ? $" {status}" : "");
+            var invoiceTitle = "INV" + (status != "Paid" ? $" {status}" : "");
             content.AppendLine(CenterText(invoiceTitle));
 
             content.AppendLine(new string('=', ReceiptWidth));
