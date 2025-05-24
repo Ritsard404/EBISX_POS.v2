@@ -401,31 +401,47 @@ namespace EBISX_POS.Util
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine();
 
-            foreach (var label in new[] { "", "COPY" })
+            if (TenderState.tenderOrder.HasOrderDiscount || TenderState.ElligiblePWDSCDiscount?.Any() == true || TenderState.tenderOrder.HasOtherPayments)
             {
-                var fullBody = new StringBuilder();
+                // Store original content once
+                string baseContent = content.ToString();
 
-                // Only add label banner if it's not empty
-                if (!string.IsNullOrWhiteSpace(label))
+                foreach (var label in new[] { "", "COPY" })
                 {
-                    fullBody.AppendLine(CenterText($"*** {label} ***"));
+                    // Create a fresh builder for each output
+                    var contentWithLabel = new StringBuilder();
+
+                    // Add label if not empty
+                    if (!string.IsNullOrWhiteSpace(label))
+                    {
+                        contentWithLabel.AppendLine(CenterText($"*** {label} ***"));
+                    }
+
+                    contentWithLabel.Append(baseContent);
+
+                    var baseName = Path.GetFileNameWithoutExtension(filePath);
+                    var ext = Path.GetExtension(filePath);
+
+                    var outName = string.IsNullOrWhiteSpace(label)
+                        ? $"{baseName}{ext}"
+                        : $"{baseName}_{label}{ext}";
+
+                    var outPath = Path.Combine(folderPath, outName);
+
+                    File.WriteAllText(outPath, contentWithLabel.ToString());
+
+                    // Print to thermal printer
+                    //PrintToPrinter(contentWithLabel); 
                 }
+            }
+            else
+            {
 
-                fullBody.Append(content.ToString());
+                // Save to file
+                File.WriteAllText(filePath, content.ToString());
 
-                var baseName = Path.GetFileNameWithoutExtension(filePath);
-                var ext = Path.GetExtension(filePath);
-
-                // Avoid underscore if label is empty
-                var outName = string.IsNullOrWhiteSpace(label)
-                    ? $"{baseName}{ext}"
-                    : $"{baseName}_{label}{ext}";
-
-                var outPath = Path.Combine(folderPath, outName);
-
-                File.WriteAllText(outPath, fullBody.ToString());
-
-                //PrintToPrinter(fullBody);
+                // Print to thermal printer
+                //PrintToPrinter(content);
             }
 
         }
