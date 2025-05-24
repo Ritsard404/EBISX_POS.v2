@@ -401,11 +401,33 @@ namespace EBISX_POS.Util
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine();
 
-            // Save to file
-            File.WriteAllText(filePath, content.ToString());
+            foreach (var label in new[] { "", "COPY" })
+            {
+                var fullBody = new StringBuilder();
 
-            // Print to thermal printer
-            //PrintToPrinter(content);
+                // Only add label banner if it's not empty
+                if (!string.IsNullOrWhiteSpace(label))
+                {
+                    fullBody.AppendLine(CenterText($"*** {label} ***"));
+                }
+
+                fullBody.Append(content.ToString());
+
+                var baseName = Path.GetFileNameWithoutExtension(filePath);
+                var ext = Path.GetExtension(filePath);
+
+                // Avoid underscore if label is empty
+                var outName = string.IsNullOrWhiteSpace(label)
+                    ? $"{baseName}{ext}"
+                    : $"{baseName}_{label}{ext}";
+
+                var outPath = Path.Combine(folderPath, outName);
+
+                File.WriteAllText(outPath, fullBody.ToString());
+
+                //PrintToPrinter(fullBody);
+            }
+
         }
 
         public static void PrintSearchedInvoice(string folderPath, string filePath, InvoiceDetailsDTO invoice, string status)
