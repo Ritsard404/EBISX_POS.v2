@@ -144,12 +144,12 @@ namespace EBISX_POS.Util
             content.AppendLine();
 
             // Save to file
-            File.WriteAllText(filePath, content.ToString());
+            //File.WriteAllText(filePath, content.ToString());
 
             // Print to thermal printer
-            //PrintToPrinter(content);
+            PrintToPrinter(content);
 
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
 
         public static async void PrintZReading(IServiceProvider serviceProvider)
@@ -265,12 +265,12 @@ namespace EBISX_POS.Util
             content.AppendLine();
 
             // Save to file
-            File.WriteAllText(filePath, content.ToString());
+            //File.WriteAllText(filePath, content.ToString());
 
             // Print to thermal printer
-            //PrintToPrinter(content);
+            PrintToPrinter(content);
 
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
 
         public static void PrintInvoice(string folderPath, string filePath, FinalizeOrderResponseDTO finalizeOrder)
@@ -428,20 +428,20 @@ namespace EBISX_POS.Util
 
                     var outPath = Path.Combine(folderPath, outName);
 
-                    File.WriteAllText(outPath, contentWithLabel.ToString());
+                    //File.WriteAllText(outPath, contentWithLabel.ToString());
 
                     // Print to thermal printer
-                    //PrintToPrinter(contentWithLabel); 
+                    PrintToPrinter(contentWithLabel);
                 }
             }
             else
             {
 
                 // Save to file
-                File.WriteAllText(filePath, content.ToString());
+                //File.WriteAllText(filePath, content.ToString());
 
                 // Print to thermal printer
-                //PrintToPrinter(content);
+                PrintToPrinter(content);
             }
 
         }
@@ -565,12 +565,12 @@ namespace EBISX_POS.Util
             content.AppendLine();
 
             // Save to file
-            File.WriteAllText(filePath, content.ToString());
+            //File.WriteAllText(filePath, content.ToString());
 
             // Print to thermal printer
-            //PrintToPrinter(content);
+            PrintToPrinter(content);
 
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
     }
 }

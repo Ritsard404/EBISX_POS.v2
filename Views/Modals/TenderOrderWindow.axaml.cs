@@ -395,7 +395,7 @@ namespace EBISX_POS.Views
                 TenderState.ElligiblePWDSCDiscount?.Clear();
 
                 // Open the receipt file automatically.
-                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+                //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
             }
             catch (UnauthorizedAccessException)
             {
