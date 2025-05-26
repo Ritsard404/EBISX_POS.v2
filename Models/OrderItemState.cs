@@ -187,7 +187,7 @@ namespace EBISX_POS.Models
              ? $"{ItemPrice:0}%"
              // 2) pure‑discount & not “other” → negative ₱ (only if not zero)
              : (MenuId == null && DrinkId == null && AddOnId == null)
-                 ? $" ₱{ItemSubTotal:G29}"
+                 ? $"- ₱{ItemSubTotal:G29}"
                  // 3) first item → positive ₱
                  : IsFirstItem
                      ? $"₱{ItemSubTotal:G29}"

@@ -91,6 +91,10 @@
 						</ItemsControl>
 					</Button>
 				</StackPanel>
+				<Grid Grid.Row="2" ColumnDefinitions="Auto, *, Auto">
+					<TextBlock FontWeight="Bold" HorizontalAlignment="Center" Grid.Column="0">Total Amount: </TextBlock>
+					<TextBlock Grid.Column="2" Text="{Binding TotalAmount}" HorizontalAlignment="Right" Margin="0,0,10,0"/>
+				</Grid>
 			</Grid>
 		</ScrollViewer>
 	</Grid>
