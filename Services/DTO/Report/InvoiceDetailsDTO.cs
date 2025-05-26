@@ -69,6 +69,7 @@ namespace EBISX_POS.Services.DTO.Report
                 VatExemptSales = string.Empty,
                 VatSales = string.Empty,
                 VatAmount = string.Empty,
+                PrintCount = string.Empty,
 
                 ElligiblePeopleDiscounts = new List<string>(),
 
