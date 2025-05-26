@@ -341,8 +341,9 @@ namespace EBISX_POS.Util
                     ? $"Disc ({TenderState.tenderOrder.PromoDiscountName}):"
                     : "Discount:";
 
-                content.AppendLine(CenterText($"{discountLabel,-15}{TenderState.tenderOrder.DiscountAmount.ToString("C", PesoCulture),17}"));
+                content.AppendLine(CenterText($"{discountLabel,-15}{"-" + TenderState.tenderOrder.DiscountAmount.ToString("C", PesoCulture),17}"));
             }
+
             content.AppendLine(CenterText($"{"Due:",-15}{TenderState.tenderOrder.AmountDue.ToString("C", PesoCulture),17}"));
 
             if (TenderState.tenderOrder.HasOtherPayments && TenderState.tenderOrder.OtherPayments != null)
@@ -495,8 +496,8 @@ namespace EBISX_POS.Util
                     string displayNameColumn = itemInfo.Description.Length > DescWidth
                         ? itemInfo.Description.Substring(0, DescWidth - 3) + "..."
                         : itemInfo.Description;
-                    string amountColumn = decimal.TryParse(itemInfo.Amount, out decimal amount) 
-                        ? amount.ToString("C", PesoCulture) 
+                    string amountColumn = decimal.TryParse(itemInfo.Amount, out decimal amount)
+                        ? amount.ToString("C", PesoCulture)
                         : itemInfo.Amount;
 
                     content.AppendLine(FormatItemLine(quantityColumn, displayNameColumn, amountColumn));
@@ -563,7 +564,7 @@ namespace EBISX_POS.Util
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine(CenterText("Thank you!"));
             content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine();
+            content.AppendLine(CenterText("DUPLICATE COPY #"));
 
             // Print to thermal printer
             PrintToPrinter(content);

@@ -19,7 +19,7 @@ namespace EBISX_POS.ViewModels
         public ObservableCollection<OrderItemState> CurrentOrder { get; } = OrderState.CurrentOrder;
 
         [ObservableProperty]
-        private string totalAmount = "₱ 0.00";
+        private string totalDue = "₱ 0.00";
 
         public OrderSummaryViewModel()
         {
@@ -29,23 +29,23 @@ namespace EBISX_POS.ViewModels
             OrderState.CurrentOrderItem.PropertyChanged += (s, e) =>
             {
                 OnPropertyChanged(nameof(CurrentOrderItem));
-                UpdateTotalAmount();
+                UpdateTotalDue();
             };
 
             OrderState.CurrentOrder.CollectionChanged += (s, e) =>
             {
                 OnPropertyChanged(nameof(CurrentOrder));
-                UpdateTotalAmount();
+                UpdateTotalDue();
             };
 
             // Initial total amount update
-            UpdateTotalAmount();
+            UpdateTotalDue();
         }
 
-        private void UpdateTotalAmount()
+        private void UpdateTotalDue()
         {
             TenderState.tenderOrder.CalculateTotalAmount();
-            TotalAmount = $"₱ {TenderState.tenderOrder.TotalAmount:N2}";
+            TotalDue = $"₱ {TenderState.tenderOrder.AmountDue:N2}";
         }
 
         private void OnOrderStateStaticPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -53,7 +53,7 @@ namespace EBISX_POS.ViewModels
             if (e.PropertyName == nameof(OrderState.CurrentOrderItem))
             {
                 OnPropertyChanged(nameof(CurrentOrderItem));
-                UpdateTotalAmount();
+                UpdateTotalDue();
             }
         }
     }
