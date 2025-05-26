@@ -465,7 +465,7 @@ namespace EBISX_POS.Util
 
             // Header
             content.AppendLine(new string('=', ReceiptWidth));
-            var invoiceTitle = "INVOICE" + (status != "Paid" ? $" {status}" : "");
+            var invoiceTitle = "INVOICE" + (status != "Paid" ? $" {status.ToUpper()}" : "");
             content.AppendLine(CenterText(invoiceTitle));
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine(CenterText(invoice.RegisteredName));
@@ -577,11 +577,6 @@ namespace EBISX_POS.Util
                 return amount.ToString("C", PesoCulture);
             }
             return value;
-        }
-
-        private static string FormatCurrency(decimal? value)
-        {
-            return value?.ToString("C", PesoCulture) ?? "0.00";
         }
     }
 }

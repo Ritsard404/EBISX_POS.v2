@@ -73,6 +73,12 @@ namespace EBISX_POS.Views
                 Console.WriteLine("? ValidationTextBlock is NULL! Check XAML x:Name.");
             }
 
+            Opened += (sender, e) =>
+            {
+                // Focus the EmailTextBox when the window opens
+                EmailTextBox?.Focus();
+            };
+
             // Close the dialog automatically after 5 seconds if no action is taken
             DispatcherTimer.RunOnce(async () =>
             {
