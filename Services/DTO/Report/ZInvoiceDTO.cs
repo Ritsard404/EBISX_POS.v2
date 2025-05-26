@@ -28,7 +28,9 @@ namespace EBISX_POS.Services.DTO.Report
     public class SalesAdjustment
     {
         public string Void { get; set; }
+        public string VoidCount { get; set; }
         public string Return { get; set; }
+        public string ReturnCount { get; set; }
     }
 
     public class VatAdjustment
@@ -59,6 +61,7 @@ namespace EBISX_POS.Services.DTO.Report
         public string EndingVoid { get; set; }
         public string BeginningReturn { get; set; }
         public string EndingReturn { get; set; }
+        public string TransactCount { get; set; }
         public string ResetCounter { get; set; }
         public string ZCounter { get; set; }
         public string PresentAccumulatedSales { get; set; }

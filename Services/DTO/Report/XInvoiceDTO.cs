@@ -41,10 +41,13 @@ namespace EBISX_POS.Services.DTO.Report
         public string Cashier { get; set; }
         public string BeginningOrNumber { get; set; }
         public string EndingOrNumber { get; set; }
+        public string TransactCount { get; set; }
         public string OpeningFund { get; set; }
         public Payment Payments { get; set; }
         public string VoidAmount { get; set; }
+        public string VoidCount { get; set; }
         public string Refund { get; set; }
+        public string RefundCount { get; set; }
         public string Withdrawal { get; set; }
         public TransactionSummary TransactionSummary { get; set; }
         public string ShortOver { get; set; }

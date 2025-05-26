@@ -9,6 +9,7 @@ namespace EBISX_POS.Services.DTO.Report
     public class InvoiceDetailsDTO
     {
         // Business Details
+        public required string PrintCount { get; set; }
         public required string RegisteredName { get; set; }
         public required string Address { get; set; }
         public required string VatTinNumber { get; set; }

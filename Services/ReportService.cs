@@ -186,6 +186,7 @@ namespace EBISX_POS.Services
                     EndingVoid = apiResponse.EndingVoid,
                     BeginningReturn = apiResponse.BeginningReturn,
                     EndingReturn = apiResponse.EndingReturn,
+                    TransactCount = apiResponse.TransactCount,
                     ResetCounter = apiResponse.ResetCounter,
                     ZCounter = apiResponse.ZCounter,
                     PresentAccumulatedSales = apiResponse.PresentAccumulatedSales,
@@ -208,12 +209,14 @@ namespace EBISX_POS.Services
                     {
                         SeniorCitizen = apiResponse.DiscountSummary.SeniorCitizen,
                         Pwd = apiResponse.DiscountSummary.PWD,
-                        Other = apiResponse.DiscountSummary.Other
+                        Other = apiResponse.DiscountSummary.Other,
                     },
                     SalesAdjustment = new SalesAdjustment
                     {
                         Void = apiResponse.SalesAdjustment.Void,
-                        Return = apiResponse.SalesAdjustment.Return
+                        VoidCount = apiResponse.SalesAdjustment.VoidCount,
+                        Return = apiResponse.SalesAdjustment.Return,
+                        ReturnCount = apiResponse.SalesAdjustment.ReturnCount
                     },
                     VatAdjustment = new VatAdjustment
                     {
@@ -230,7 +233,7 @@ namespace EBISX_POS.Services
                         OtherPayments = apiResponse.TransactionSummary.OtherPayments?.Select(p => new OtherPayment
                         {
                             AmountString = p.AmountString,
-                            Name = p.Name
+                            Name = p.Name,
                         }).ToList() ?? new List<OtherPayment>()
                     },
                     OpeningFund = apiResponse.OpeningFund,
@@ -336,6 +339,7 @@ namespace EBISX_POS.Services
                     Cashier = apiResponse.Cashier,
                     BeginningOrNumber = apiResponse.BeginningOrNumber,
                     EndingOrNumber = apiResponse.EndingOrNumber,
+                    TransactCount = apiResponse.TransactCount,
                     OpeningFund = apiResponse.OpeningFund,
                     Payments = new Payment
                     {
@@ -343,12 +347,14 @@ namespace EBISX_POS.Services
                         OtherPayments = apiResponse.Payments.OtherPayments?.Select(p => new OtherPayment
                         {
                             Name = p.Name,
-                            AmountString = p.AmountString
+                            AmountString = p.AmountString,
                         }).ToList() ?? new List<OtherPayment>(),
                         Total = apiResponse.Payments.Total
                     },
                     VoidAmount = apiResponse.VoidAmount,
+                    VoidCount = apiResponse.VoidCount,
                     Refund = apiResponse.Refund,
+                    RefundCount = apiResponse.RefundCount,
                     Withdrawal = apiResponse.Withdrawal,
                     TransactionSummary = new TransactionSummary
                     {
@@ -404,6 +410,7 @@ namespace EBISX_POS.Services
                 return new InvoiceDetailsDTO
                 {
                     // Business Details
+                    PrintCount = apiResponse.PrintCount,
                     RegisteredName = apiResponse.RegisteredName,
                     Address = apiResponse.Address,
                     VatTinNumber = apiResponse.VatTinNumber,

@@ -101,6 +101,7 @@ namespace EBISX_POS.Util
             content.AppendLine();
             content.AppendLine(AlignText("Beg. OR #:", rpt.BeginningOrNumber));
             content.AppendLine(AlignText("End. OR #:", rpt.EndingOrNumber));
+            content.AppendLine(AlignText("Txn Count #:", rpt.TransactCount));
             content.AppendLine();
 
             // Opening fund
@@ -122,9 +123,9 @@ namespace EBISX_POS.Util
             content.AppendLine(new string('=', ReceiptWidth));
 
             // Void / Refund / Withdrawal
-            content.AppendLine(AlignText("VOID", rpt.VoidAmount));
+            content.AppendLine(AlignText($"VOID ({rpt.VoidCount})", rpt.VoidAmount));
             content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(AlignText("REFUND", rpt.Refund));
+            content.AppendLine(AlignText($"REFUND ({rpt.RefundCount})", rpt.Refund));
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine(AlignText("WITHDRAWAL", rpt.Withdrawal));
             content.AppendLine(new string('=', ReceiptWidth));
@@ -199,6 +200,7 @@ namespace EBISX_POS.Util
             content.AppendLine(AlignText("End. RETURN #:", rpt.EndingReturn));
             content.AppendLine();
 
+            content.AppendLine(AlignText("Txn Count #:", rpt.TransactCount));
             content.AppendLine(AlignText("Reset Counter No.:", rpt.ResetCounter));
             content.AppendLine(AlignText("Z Counter No.:", rpt.ZCounter));
             content.AppendLine(new string('-', ReceiptWidth));
@@ -227,15 +229,15 @@ namespace EBISX_POS.Util
 
             // Discounts
             content.AppendLine(CenterText("DISCOUNT SUMMARY"));
-            content.AppendLine(AlignText("SC Disc. :", rpt.DiscountSummary.SeniorCitizen));
-            content.AppendLine(AlignText("PWD Disc. :", rpt.DiscountSummary.Pwd));
-            content.AppendLine(AlignText("Other Disc. :", rpt.DiscountSummary.Other));
+            content.AppendLine(AlignText($"SC Disc. ():", rpt.DiscountSummary.SeniorCitizen));
+            content.AppendLine(AlignText($"PWD Disc. :", rpt.DiscountSummary.Pwd));
+            content.AppendLine(AlignText($"Other Disc. :", rpt.DiscountSummary.Other));
             content.AppendLine(new string('-', ReceiptWidth));
 
             // Adjustments
             content.AppendLine(CenterText("SALES ADJUSTMENT"));
-            content.AppendLine(AlignText("VOID :", rpt.SalesAdjustment.Void));
-            content.AppendLine(AlignText("RETURN :", rpt.SalesAdjustment.Return));
+            content.AppendLine(AlignText($"VOID ({rpt.SalesAdjustment.VoidCount}):", rpt.SalesAdjustment.Void));
+            content.AppendLine(AlignText($"RETURN ({rpt.SalesAdjustment.ReturnCount}):", rpt.SalesAdjustment.Return));
             content.AppendLine(new string('-', ReceiptWidth));
 
             content.AppendLine(CenterText("VAT ADJUSTMENT"));
@@ -564,7 +566,7 @@ namespace EBISX_POS.Util
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine(CenterText("Thank you!"));
             content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText("DUPLICATE COPY #"));
+            content.AppendLine(CenterText($"DUPLICATE COPY #{invoice.PrintCount}"));
 
             // Print to thermal printer
             PrintToPrinter(content);

@@ -41,12 +41,9 @@ namespace EBISX_POS.Views
 
             CashInDrawer.AddHandler(TextInputEvent, AmountTextBox_OnTextInput, RoutingStrategies.Tunnel);
 
-
-
             Opened += (sender, e) =>
             {
-                // Focus the EmailTextBox when the window opens
-                ManagerEmail?.Focus();
+                CashInDrawer?.Focus();
             };
 
             // Close the dialog automatically after 5 seconds if no action is taken
