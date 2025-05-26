@@ -21,8 +21,11 @@ namespace EBISX_POS.Services.DTO.Report
     public class DiscountSummary
     {
         public string SeniorCitizen { get; set; }
+        public string SeniorCitizenCount { get; set; }
         public string Pwd { get; set; }
+        public string PwdCount { get; set; }
         public string Other { get; set; }
+        public string OtherCount { get; set; }
     }
 
     public class SalesAdjustment

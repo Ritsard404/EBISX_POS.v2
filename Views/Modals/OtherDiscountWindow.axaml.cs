@@ -142,6 +142,7 @@ public partial class OtherDiscountWindow : Window
         // Refresh UI display (if needed by your application).
         OrderState.CurrentOrderItem.RefreshDisplaySubOrders();
 
+        TenderState.tenderOrder.CalculateTotalAmount();
         LoadingOverlay.IsVisible = false;
         Close();
     }

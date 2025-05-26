@@ -229,9 +229,9 @@ namespace EBISX_POS.Util
 
             // Discounts
             content.AppendLine(CenterText("DISCOUNT SUMMARY"));
-            content.AppendLine(AlignText($"SC Disc. ():", rpt.DiscountSummary.SeniorCitizen));
-            content.AppendLine(AlignText($"PWD Disc. :", rpt.DiscountSummary.Pwd));
-            content.AppendLine(AlignText($"Other Disc. :", rpt.DiscountSummary.Other));
+            content.AppendLine(AlignText($"SC Disc. ({rpt.DiscountSummary.SeniorCitizenCount}):", rpt.DiscountSummary.SeniorCitizen));
+            content.AppendLine(AlignText($"PWD Disc. ({rpt.DiscountSummary.PwdCount}):", rpt.DiscountSummary.Pwd));
+            content.AppendLine(AlignText($"Other Disc. ({rpt.DiscountSummary.OtherCount}):", rpt.DiscountSummary.Other));
             content.AppendLine(new string('-', ReceiptWidth));
 
             // Adjustments

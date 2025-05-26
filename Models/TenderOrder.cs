@@ -49,11 +49,7 @@ namespace EBISX_POS.Models
         partial void OnHasScDiscountChanged(bool oldValue, bool newValue) => UpdateComputedValues();
         partial void OnHasPromoDiscountChanged(bool oldValue, bool newValue) => UpdateComputedValues();
         partial void OnHasCouponDiscountChanged(bool oldValue, bool newValue) => UpdateComputedValues();
-        partial void OnOtherPaymentsChanged(ObservableCollection<AddAlternativePaymentsDTO>? oldValue, ObservableCollection<AddAlternativePaymentsDTO>? newValue)
-        {
-            UpdateComputedValues();
-            //CalculateTotalAmount();
-        }
+        partial void OnOtherPaymentsChanged(ObservableCollection<AddAlternativePaymentsDTO>? oldValue, ObservableCollection<AddAlternativePaymentsDTO>? newValue) => UpdateComputedValues();
 
         public void Reset()
         {
@@ -66,6 +62,9 @@ namespace EBISX_POS.Models
 
         public bool CalculateTotalAmount()
         {
+            var oldTotalAmount = TotalAmount;
+            var oldAmountDue = AmountDue;
+
             TotalAmount = OrderState.CurrentOrder
                 .Sum(orderItem => orderItem.TotalPrice);
 
@@ -76,11 +75,25 @@ namespace EBISX_POS.Models
             VatAmount = (!HasOrderDiscount ? TotalAmount - (TotalAmount / 1.12m) : VatSales - (VatSales / 1.12m));
 
             UpdateComputedValues();
+
+            // Explicitly notify changes if values have changed
+            if (oldTotalAmount != TotalAmount)
+            {
+                OnPropertyChanged(nameof(TotalAmount));
+            }
+            if (oldAmountDue != AmountDue)
+            {
+                OnPropertyChanged(nameof(AmountDue));
+            }
+
             return TotalAmount <= 0;
         }
 
         private void UpdateComputedValues()
         {
+            var oldAmountDue = AmountDue;
+            var oldDiscountAmount = DiscountAmount;
+
             HasPromoDiscount = PromoDiscountAmount > 0 || PromoDiscountPercent > 0;
             HasCouponDiscount = OrderState.CurrentOrder
                 .Any(orderItem => orderItem.CouponCode != null);
@@ -117,7 +130,6 @@ namespace EBISX_POS.Models
             var otherPaymentsTotal = OtherPayments?.Sum(payment => payment.Amount) ?? 0m;
             TenderAmount = CashTenderAmount + otherPaymentsTotal;
 
-
             if (PromoDiscountAmount >= TotalAmount)
             {
                 AmountDue = 0;
@@ -125,9 +137,18 @@ namespace EBISX_POS.Models
             }
             else
             {
-
                 AmountDue = TotalAmount - DiscountAmount;
                 ChangeAmount = TenderAmount - AmountDue;
+            }
+
+            // Explicitly notify changes if values have changed
+            if (oldAmountDue != AmountDue)
+            {
+                OnPropertyChanged(nameof(AmountDue));
+            }
+            if (oldDiscountAmount != DiscountAmount)
+            {
+                OnPropertyChanged(nameof(DiscountAmount));
             }
         }
 

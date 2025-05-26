@@ -208,8 +208,11 @@ namespace EBISX_POS.Services
                     DiscountSummary = new DiscountSummary
                     {
                         SeniorCitizen = apiResponse.DiscountSummary.SeniorCitizen,
+                        SeniorCitizenCount = apiResponse.DiscountSummary.SeniorCitizenCount,
                         Pwd = apiResponse.DiscountSummary.PWD,
+                        PwdCount = apiResponse.DiscountSummary.PWDCount,
                         Other = apiResponse.DiscountSummary.Other,
+                        OtherCount = apiResponse.DiscountSummary.OtherCount
                     },
                     SalesAdjustment = new SalesAdjustment
                     {

@@ -38,13 +38,24 @@ namespace EBISX_POS.ViewModels
                 UpdateTotalDue();
             };
 
+            // Subscribe to TenderState changes
+            TenderState.tenderOrder.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(TenderOrder.AmountDue) ||
+                    e.PropertyName == nameof(TenderOrder.TotalAmount) ||
+                    e.PropertyName == nameof(TenderOrder.DiscountAmount))
+                {
+                    UpdateTotalDue();
+                }
+            };
+
             // Initial total amount update
             UpdateTotalDue();
         }
 
         private void UpdateTotalDue()
         {
-            TenderState.tenderOrder.CalculateTotalAmount();
+            // No need to call CalculateTotalAmount here as it's already called in the discount windows
             TotalDue = $"₱ {TenderState.tenderOrder.AmountDue:N2}";
         }
 
