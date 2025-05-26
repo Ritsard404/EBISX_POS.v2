@@ -203,8 +203,6 @@ namespace EBISX_POS.Views
 
             //var result = await box.ShowAsPopupAsync(this);
 
-            string managerEmail = "user1@example.com";
-
             //switch (result)
             //{
             //    case ButtonResult.Ok:
@@ -234,7 +232,9 @@ namespace EBISX_POS.Views
 
                 OrderState.CurrentOrderItem = new OrderItemState();
                 OrderState.CurrentOrder.Clear();
-                OrderState.CurrentOrderItem.RefreshDisplaySubOrders();
+                OrderState.CurrentOrderItem.RefreshDisplaySubOrders(); 
+                TenderState.tenderOrder.CalculateTotalAmount();
+
                 return;
             }
 

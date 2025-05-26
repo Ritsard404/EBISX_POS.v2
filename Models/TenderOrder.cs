@@ -69,9 +69,11 @@ namespace EBISX_POS.Models
                 .Sum(orderItem => orderItem.TotalPrice);
 
             VatExemptSales = (HasScDiscount || HasPwdDiscount) ? DiscountAmount : 0m;
-            VatSales = (!HasOrderDiscount ? TotalAmount / 1.12m : OrderState.CurrentOrder
+
+            VatSales = !HasOrderDiscount ? TotalAmount / 1.12m : OrderState.CurrentOrder
                 .Where(d => !d.IsPwdDiscounted && !d.IsSeniorDiscounted)
-                .Sum(orderItem => orderItem.TotalPrice) / 1.12m);
+                .Sum(orderItem => orderItem.TotalPrice) / 1.12m;
+
             VatAmount = (!HasOrderDiscount ? TotalAmount - (TotalAmount / 1.12m) : VatSales - (VatSales / 1.12m));
 
             UpdateComputedValues();

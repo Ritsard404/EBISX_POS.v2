@@ -12,6 +12,8 @@ using EBISX_POS.Models;
 using EBISX_POS.State;
 using System.Collections.ObjectModel;
 using System.Linq;
+using static Azure.Core.HttpHeader;
+using System.Collections.Generic;
 
 namespace EBISX_POS;
 
@@ -93,8 +95,9 @@ public partial class OtherDiscountWindow : Window
             Submit_Button.IsEnabled = true;
             return;
         }
-
         OrderState.CurrentOrder.Clear();
+
+        TenderState.ElligiblePWDSCDiscount.Add(nameText);
 
         Name.Clear();
         PercentDiscountTextBox.Clear();

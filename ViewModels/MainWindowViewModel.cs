@@ -114,10 +114,6 @@ namespace EBISX_POS.ViewModels
             OrderState.CurrentOrderItem.RefreshDisplaySubOrders();
 
             TenderState.ElligiblePWDSCDiscount = eligiblePwdScNames;
-            foreach (var name in eligiblePwdScNames)
-            {
-                Debug.WriteLine($"Eligible PWD/SC Name: {name}");
-            }
         }
 
         private void StartConnectivityTracking()
