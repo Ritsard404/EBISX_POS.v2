@@ -227,6 +227,18 @@ namespace EBISX_POS.Views
             // Refresh UI display (if needed by your application).
             OrderState.CurrentOrderItem.RefreshDisplaySubOrders();
             CashierState.ManagerEmail = null;
+
+
+
+            TenderState.tenderOrder.Reset();
+            TenderState.tenderOrder.HasScDiscount = OrderState.CurrentOrder.Any(d => d.IsSeniorDiscounted);
+            TenderState.tenderOrder.HasPwdDiscount = OrderState.CurrentOrder.Any(d => d.IsPwdDiscounted);
+
+            // Select the PromoDiscountAmount from the first order that has a non-null value
+            TenderState.tenderOrder.PromoDiscountAmount = OrderState.CurrentOrder
+                .Where(d => d.PromoDiscountAmount != null)
+                .Select(d => d.PromoDiscountAmount)
+                .FirstOrDefault() ?? 0m;
             TenderState.tenderOrder.CalculateTotalAmount();
             Close();
             Submit_Button.IsEnabled = true;

@@ -142,6 +142,16 @@ public partial class OtherDiscountWindow : Window
         // Refresh UI display (if needed by your application).
         OrderState.CurrentOrderItem.RefreshDisplaySubOrders();
 
+
+        TenderState.tenderOrder.Reset();
+        TenderState.tenderOrder.HasScDiscount = OrderState.CurrentOrder.Any(d => d.IsSeniorDiscounted);
+        TenderState.tenderOrder.HasPwdDiscount = OrderState.CurrentOrder.Any(d => d.IsPwdDiscounted);
+
+        // Select the PromoDiscountAmount from the first order that has a non-null value
+        TenderState.tenderOrder.PromoDiscountAmount = OrderState.CurrentOrder
+            .Where(d => d.PromoDiscountAmount != null)
+            .Select(d => d.PromoDiscountAmount)
+            .FirstOrDefault() ?? 0m;
         TenderState.tenderOrder.CalculateTotalAmount();
         LoadingOverlay.IsVisible = false;
         Close();

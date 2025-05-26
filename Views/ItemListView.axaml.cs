@@ -127,6 +127,7 @@ namespace EBISX_POS.Views
                         mainWindow.IsLoadMenu.IsVisible = false;
                         mainWindow.IsMenuAvail.IsVisible = true;
                     }
+                    TenderState.tenderOrder.CalculateTotalAmount();
                     return;
                 }
 

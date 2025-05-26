@@ -32,6 +32,7 @@ namespace EBISX_POS.Views
         private async void AddOrderButton_Click(object? sender, RoutedEventArgs e)
         {
             await OrderState.FinalizeCurrentOrder(isSolo: false, this);
+            TenderState.tenderOrder.CalculateTotalAmount();
             Close();
         }
     }
