@@ -97,8 +97,11 @@ public partial class OtherDiscountWindow : Window
         }
         OrderState.CurrentOrder.Clear();
 
-        TenderState.ElligiblePWDSCDiscount.Add(nameText);
-
+        TenderState.ElligiblePWDSCDiscount = new List<string>
+            {
+                nameText
+            };
+        
         Name.Clear();
         PercentDiscountTextBox.Clear();
 
