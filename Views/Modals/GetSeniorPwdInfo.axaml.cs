@@ -227,6 +227,7 @@ namespace EBISX_POS.Views
             // Refresh UI display (if needed by your application).
             OrderState.CurrentOrderItem.RefreshDisplaySubOrders();
             CashierState.ManagerEmail = null;
+            TenderState.tenderOrder.CalculateTotalAmount();
             Close();
             Submit_Button.IsEnabled = true;
 
