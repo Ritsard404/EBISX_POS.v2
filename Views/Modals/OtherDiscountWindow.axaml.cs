@@ -12,7 +12,6 @@ using EBISX_POS.Models;
 using EBISX_POS.State;
 using System.Collections.ObjectModel;
 using System.Linq;
-using static Azure.Core.HttpHeader;
 using System.Collections.Generic;
 
 namespace EBISX_POS;
