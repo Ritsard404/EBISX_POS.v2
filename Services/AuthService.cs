@@ -81,7 +81,7 @@ namespace EBISX_POS.Services
             {
                 var logIn = await _auth.LogIn(logInDTO);
                 if(!logIn.success)
-                    return (false, false, "Invalid credentials. Please try again.", "");
+                    return (false, false, logIn.name, "");
 
                 return (logIn.success, logIn.isManager, logIn.email, logIn.name);  // Fixed order
 
