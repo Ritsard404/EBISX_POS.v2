@@ -15,6 +15,8 @@ using EBISX_POS.Util;
 using EBISX_POS.API.Models;
 using EBISX_POS.Services.DTO.Report;
 using EBISX_POS.Helper;
+using System.Threading.Tasks;
+using EBISX_POS.API.Services.Interfaces;
 
 namespace EBISX_POS.Views.Manager
 {
@@ -27,7 +29,9 @@ namespace EBISX_POS.Views.Manager
         {
 
             InitializeComponent();
-            DataContext = new SalesHistoryViewModel();
+            DataContext = new SalesHistoryViewModel(this);
+            var dataService = App.Current.Services.GetRequiredService<IData>();
+
             _configuration = configuration;
 
         }
@@ -36,6 +40,7 @@ namespace EBISX_POS.Views.Manager
         {
             Close();
         }
+
         private async void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
             // Get the ViewModel from DataContext

@@ -63,7 +63,9 @@ namespace EBISX_POS
                     salesReport.XInvoiceReport,
                     salesReport.ZInvoiceReport,
                     salesReport.CashTrackReport,
-                    salesReport.TransactionLogs
+                    salesReport.TransactionLogs,
+                    salesReport.AuditTrailFolder,
+                    salesReport.TransactionLogsFolder
                 };
 
                 foreach (var directory in reportDirectories)

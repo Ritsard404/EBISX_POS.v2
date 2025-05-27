@@ -189,13 +189,13 @@ namespace EBISX_POS.Views
         private async void ManagerLog_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
             var managerLog = new UserLogsWindow();
-            managerLog.DataContext = new UserLogsViewModel(true);
+            managerLog.DataContext = new UserLogsViewModel(true, managerLog);
             await managerLog.ShowDialog(this);
         }
         private async void CashierLog_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
             var managerLog = new UserLogsWindow();
-            managerLog.DataContext = new UserLogsViewModel(false);
+            managerLog.DataContext = new UserLogsViewModel(false, managerLog);
             await managerLog.ShowDialog(this);
         }
         private async void LoadData_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

@@ -17,7 +17,9 @@
     "XInvoiceReport": "XInvoiceReport",
     "ZInvoiceReport": "ZInvoiceReport",
     "CashTrackReport": "Cashtrack",
-    "TransactionLogs": "TransactionLogs"
+    "TransactionLogs": "TransactionLogs",
+    "TransactionLogsFolder": "C:\\Logs\\TransactionLogs",
+    "AuditTrailFolder": "C:\\Logs\\AuditTrail"
   },
   "Database": {
     "PosConnectionString": "Data Source=ebisx_pos.db",

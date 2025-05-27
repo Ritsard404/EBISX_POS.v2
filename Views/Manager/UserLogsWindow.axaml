@@ -12,9 +12,9 @@
 		SystemDecorations="None"
 		CornerRadius="10">
 	<Border BorderThickness="15"  CornerRadius="10" BorderBrush="Orange" Padding="10">
-		<Grid HorizontalAlignment="Center" RowDefinitions="Auto, Auto, Auto, Auto, *, Auto" ColumnDefinitions="Auto, *">
+		<Grid HorizontalAlignment="Center" RowDefinitions="Auto, Auto, Auto, Auto, *, Auto, Auto" ColumnDefinitions="Auto, *">
 			<!-- Header Section -->
-			<Grid Grid.Row="0" ColumnDefinitions="*, Auto" Grid.Column="0" Margin="10,0,10,6">
+			<Grid Grid.Row="0" ColumnDefinitions="*, Auto" Grid.Column="0" Margin="10,0,0,6">
 
 				<TextBlock
 					Grid.Column="0"
@@ -111,6 +111,9 @@
 				<TextBlock Text="{Binding TotalPages}" VerticalAlignment="Center"/>
 				<Button Content="Next &gt;" Command="{Binding NextPageCommand}" />
 			</StackPanel>
+
+			<!-- Print Transaction List Button -->
+			<Button Command="{Binding PrintCommand}" Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,10" Content="Print AUDIT TRAIL LIST" />
 
 		</Grid>
 	</Border>

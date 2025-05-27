@@ -39,5 +39,7 @@
         /// Path for storing transaction log files
         /// </summary>
         public required string TransactionLogs { get; set; }
+        public required string TransactionLogsFolder { get; set; }
+        public required string AuditTrailFolder { get; set; }
     }
 }

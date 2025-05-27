@@ -1,6 +1,7 @@
 using EBISX_POS.API.Data;
 using EBISX_POS.API.Services;
 using EBISX_POS.API.Services.Interfaces;
+using EBISX_POS.API.Services.PDF;
 using EBISX_POS.API.Services.Repositories;
 using EBISX_POS.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -83,6 +84,10 @@ namespace EBISX_POS.API.Extensions
 
         private static IServiceCollection AddRepositories(this IServiceCollection services)
         {
+            // Register PDF services
+            services.AddScoped<AuditTrailPDFService>();
+            services.AddScoped<TransactionListPDFService>();
+
             services.AddScoped<IAuth, AuthRepository>();
             services.AddScoped<IMenu, MenuRepository>();
             services.AddScoped<IOrder, OrderRepository>();
