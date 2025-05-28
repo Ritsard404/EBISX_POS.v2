@@ -547,10 +547,10 @@ namespace EBISX_POS.Util
                 foreach (var pwdSc in invoice.ElligiblePeopleDiscounts)
                 {
                     string nameText = $"Name: {pwdSc.ToUpper()}";
-                    content.AppendLine(CenterText(nameText));
-                    content.AppendLine(CenterText("Address: _____________"));
-                    content.AppendLine(CenterText("TIN: ________________"));
-                    content.AppendLine(CenterText("Signature: __________"));
+                    content.AppendLine(nameText);
+                    content.AppendLine("Address: _____________");
+                    content.AppendLine("TIN: ________________");
+                    content.AppendLine("Signature: __________");
                     content.AppendLine();
                 }
             }

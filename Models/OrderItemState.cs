@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 
@@ -172,30 +173,45 @@ namespace EBISX_POS.Models
         }
 
 
+        private readonly CultureInfo PesoCulture = new CultureInfo("en-PH");
 
         // Opacity Property (replaces a converter)
         public double Opacity => IsFirstItem ? 1.0 : 0.0;
 
         public bool IsUpgradeMeal => ItemPrice > 0;
 
-        public string ItemPriceString =>
-     // 0) if the item’s price (or its subtotal) is zero, show nothing:
-     (ItemPrice == 0m || ItemSubTotal == 0m)
-         ? string.Empty
-         // 1) explicit “other” → percent
-         : IsOtherDisc
-             ? $"{ItemPrice:0}%"
-             // 2) pure‑discount & not “other” → negative ₱ (only if not zero)
-             : (MenuId == null && DrinkId == null && AddOnId == null)
-                 ? $"- ₱{ItemSubTotal:G29}"
-                 // 3) first item → positive ₱
-                 : IsFirstItem
-                     ? $"₱{ItemSubTotal:G29}"
-                     // 4) upgrade → +₱ (only if ItemPrice > 0)
-                     : IsUpgradeMeal
-                         ? $"+ ₱{ItemSubTotal:G29}"
-                         // 5) otherwise (i.e. a non‐first, non‐upgrade) → – ₱
-                         : $"- ₱{ItemSubTotal:G29}";
+        public string ItemPriceString
+        {
+            get
+            {
+                // 0) if the item’s price (or its subtotal) is zero, show nothing:
+                if (ItemPrice == 0m || ItemSubTotal == 0m)
+                    return string.Empty;
+
+                // 1) explicit “other” → percent
+                if (IsOtherDisc)
+                    return $"{ItemPrice:0}%";
+
+                // Prepare the currency string (e.g. “₱1,234.00”)
+                var currency = ItemSubTotal.ToString("C", PesoCulture);
+
+                // 2) pure-discount & not “other” → negative ₱ (only if not zero)
+                //    (Here “pure discount” means no MenuId, no DrinkId, no AddOnId)
+                if (MenuId == null && DrinkId == null && AddOnId == null)
+                    return $"- {currency}";
+
+                // 3) first item → positive ₱ (no sign prefix needed; ToString("C") already includes “₱”)
+                if (IsFirstItem)
+                    return currency;
+
+                // 4) upgrade → +₱ (only if ItemPrice > 0)
+                if (IsUpgradeMeal)
+                    return $"+ {currency}";
+
+                // 5) otherwise (i.e. a non-first, non-upgrade) → – ₱
+                return $"- {currency}";
+            }
+        }
 
     }
 }

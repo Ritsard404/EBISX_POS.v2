@@ -1,15 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<TrimMode>link</TrimMode>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
-		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<BuiltInComInteropSupport>false</BuiltInComInteropSupport>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<AvaloniaResource Include="Assets\**" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<!-- Preserve Avalonia types for reflection -->
+		<TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
+		<TrimmerRootAssembly Include="Avalonia.Themes.Default" />
 	</ItemGroup>
 
 	<ItemGroup>

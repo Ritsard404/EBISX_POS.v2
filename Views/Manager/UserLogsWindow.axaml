@@ -113,7 +113,7 @@
 			</StackPanel>
 
 			<!-- Print Transaction List Button -->
-			<Button Command="{Binding PrintCommand}" Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,10" Content="Print AUDIT TRAIL LIST" />
+			<Button Command="{Binding PrintCommand}" IsVisible="{Binding IsManagerLogs}" Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,10" Content="Print AUDIT TRAIL LIST" />
 
 		</Grid>
 	</Border>
